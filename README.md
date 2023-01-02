@@ -1,5 +1,7 @@
-# Initial file
+# Web-Application "RedNet"
 
- initial file
+Social network for data exchange, discussions, organization of events and communities
 
-## initial file
+## Project Description
+
+## Technology Stack
