@@ -1,10 +1,18 @@
 # Web-Application "RedNet"
 Social network for data exchange, discussions, organization of events and communities
 
-## Project Description
-### 1.	Provided Features
-### 2.	Get Started Instruction
 
+## Project Description
+
+### Provided Features
+#### 1.	Authentication and authorization
+#### 2. Communication
+#### 3. Viewing text, graphic and audio content
+#### 4. Creating communities
+#### 5. Creating events in communities 
+
+
+### Get Started Instruction
 
 
 ## Technology Stack
