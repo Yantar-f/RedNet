@@ -1,8 +1,9 @@
 # Web-Application "RedNet"
-
 Social network for data exchange, discussions, organization of events and communities
 
 ## Project Description
+### 1.	Provided Features
+### 2.	Get Started Instruction
 
 
 
