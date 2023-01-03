@@ -11,6 +11,7 @@ Social network for data exchange, discussions, organization of events and commun
 #### 4. Creating communities
 #### 5. Creating events in communities 
 
+### User interface design
 
 ### Get Started Instruction
 
