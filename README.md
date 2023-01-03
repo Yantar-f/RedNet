@@ -13,8 +13,7 @@ Social network for data exchange, discussions, organization of events and commun
 
 ### User interface design
 
-### Get Started Instruction
-
+## Get Started Instruction
 
 ## Technology Stack
 BackEnd stack:
