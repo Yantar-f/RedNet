@@ -2,6 +2,8 @@ package com.rn.entity;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 
 
@@ -22,14 +24,20 @@ import jakarta.validation.constraints.Size;
 public class User {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @SequenceGenerator(
+        name = "users_seq_gen",
+        sequenceName = "users_seq",
+        allocationSize = 1
+    )
+    @GeneratedValue(
+        strategy = GenerationType.SEQUENCE,
+        generator = "users_seq_gen"
+    )
     @Column(name = "id")
     private Long id;
 
-    @Column(
-        name = "username",
-        length = 50
-    )
+    @Column(name = "username")
+    @NotNull
     @Size(
         min = 2,
         max = 50
@@ -37,24 +45,24 @@ public class User {
     private String username;
 
     @Column(name = "email")
+    @NotBlank
     @Email
     private String email;
 
     @Column(name = "password")
+    @NotNull
     @Size(
         min = 8,
-        max = 250
+        max = 100
     )
     private String password;
 
     public User () {}
     public User (
-        Long id,
         String username,
         String email,
         String password
     ) {
-        this.id = id;
         this.username = username;
         this.email = email;
         this.password = password;
