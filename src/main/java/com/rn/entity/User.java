@@ -44,11 +44,6 @@ public class User {
     )
     private String username;
 
-    @Column(name = "email")
-    @NotBlank
-    @Email
-    private String email;
-
     @Column(name = "password")
     @NotNull
     @Size(
@@ -56,6 +51,11 @@ public class User {
         max = 100
     )
     private String password;
+
+    @Column(name = "email")
+    @NotBlank
+    @Email
+    private String email;
 
     public User () {}
     public User (
