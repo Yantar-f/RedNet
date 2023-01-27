@@ -1,15 +1,19 @@
-package com.rn.entity;
+package com.rn.auth.entity;
 
+import com.rn.auth.entity.EnumAppRole;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 
+import java.util.HashSet;
+import java.util.Set;
+
 
 @Entity
 @Table(
-    name = "users",
+    name = "app_users",
     uniqueConstraints = {
         @UniqueConstraint(
             name = "username_unique",
@@ -21,17 +25,17 @@ import jakarta.validation.constraints.Size;
         )
     }
 )
-public class User {
+public class AppUser {
 
     @Id
     @SequenceGenerator(
-        name = "users_seq_gen",
-        sequenceName = "users_seq",
+        name = "app_users_seq_gen",
+        sequenceName = "app_users_seq",
         allocationSize = 1
     )
     @GeneratedValue(
         strategy = GenerationType.SEQUENCE,
-        generator = "users_seq_gen"
+        generator = "app_users_seq_gen"
     )
     @Column(name = "id")
     private Long id;
@@ -57,8 +61,15 @@ public class User {
     @Email
     private String email;
 
-    public User () {}
-    public User (
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(
+        name = "app_roles",
+        joinColumns = @JoinColumn(name = "app_user_id"),
+        inverseJoinColumns = @JoinColumn(name = "app_role_id")
+    )
+    Set<EnumAppRole> AppRoles = new HashSet<>();
+    public AppUser() {}
+    public AppUser(
         String username,
         String email,
         String password
