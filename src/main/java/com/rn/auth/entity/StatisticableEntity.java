@@ -12,7 +12,10 @@ import java.util.Date;
 @MappedSuperclass
 public class StatisticableEntity {
 
-    @Column(name = "status")
+    @Column(
+        name = "status",
+        length = 30
+    )
     @Enumerated(EnumType.STRING)
     private EnumStatus status;
 
