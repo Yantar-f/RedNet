@@ -1,6 +1,5 @@
 package com.rn.auth.entity;
 
-import com.rn.auth.entity.EnumAppRole;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
@@ -25,7 +24,7 @@ import java.util.Set;
         )
     }
 )
-public class AppUser {
+public class AppUser extends StatisticableEntity{
 
     @Id
     @SequenceGenerator(
@@ -61,13 +60,15 @@ public class AppUser {
     @Email
     private String email;
 
-    @ManyToMany(fetch = FetchType.LAZY)
+    @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
-        name = "app_roles",
+        name = "app_users_to_roles",
         joinColumns = @JoinColumn(name = "app_user_id"),
         inverseJoinColumns = @JoinColumn(name = "app_role_id")
     )
-    Set<EnumAppRole> AppRoles = new HashSet<>();
+    Set<AppRole> AppRoles = new HashSet<>();
+
+
     public AppUser() {}
     public AppUser(
         String username,
@@ -78,6 +79,7 @@ public class AppUser {
         this.email = email;
         this.password = password;
     }
+
 
     public Long getId() {
         return id;
