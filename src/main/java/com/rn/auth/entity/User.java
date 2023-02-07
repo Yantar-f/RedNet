@@ -1,12 +1,17 @@
 package com.rn.auth.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 
+import java.util.Collection;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 
@@ -24,7 +29,7 @@ import java.util.Set;
         )
     }
 )
-public class AppUser extends StatisticableEntity{
+public class AppUser extends StatisticableEntity implements UserDetails {
 
     @Id
     @SequenceGenerator(
@@ -66,7 +71,8 @@ public class AppUser extends StatisticableEntity{
         joinColumns = @JoinColumn(name = "app_user_id"),
         inverseJoinColumns = @JoinColumn(name = "app_role_id")
     )
-    Set<AppRole> AppRoles = new HashSet<>();
+    Set<AppRole> appRoles = new HashSet<>();
+
 
 
     public AppUser() {}
@@ -81,6 +87,26 @@ public class AppUser extends StatisticableEntity{
     }
 
 
+    @Override
+    public boolean isAccountNonExpired() {
+        return false;
+    }
+
+    @Override
+    public boolean isAccountNonLocked() {
+        return false;
+    }
+
+    @Override
+    public boolean isCredentialsNonExpired() {
+        return false;
+    }
+
+    @Override
+    public boolean isEnabled() {
+        return false;
+    }
+
     public Long getId() {
         return id;
     }
@@ -89,12 +115,18 @@ public class AppUser extends StatisticableEntity{
         return username;
     }
 
-    public String getEmail() {
-        return email;
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        return null;
     }
 
+    @Override
     public String getPassword() {
         return password;
+    }
+
+    public String getEmail() {
+        return email;
     }
 
     public void setId(Long id) {
@@ -112,6 +144,5 @@ public class AppUser extends StatisticableEntity{
     public void setPassword(String password) {
         this.password = password;
     }
-
 
 }
