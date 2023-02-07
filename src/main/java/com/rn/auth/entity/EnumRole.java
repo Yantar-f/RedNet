@@ -1,6 +1,6 @@
 package com.rn.auth.entity;
 
-public enum EnumAppRole {
+public enum EnumRole {
     USER,
     ADMIN
 }

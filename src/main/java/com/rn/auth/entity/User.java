@@ -1,6 +1,5 @@
 package com.rn.auth.entity;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
@@ -11,13 +10,12 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collection;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 
 @Entity
 @Table(
-    name = "app_users",
+    name = "users",
     uniqueConstraints = {
         @UniqueConstraint(
             name = "username_unique",
@@ -29,27 +27,24 @@ import java.util.Set;
         )
     }
 )
-public class AppUser extends StatisticableEntity implements UserDetails {
+public class User extends StatisticableEntity implements UserDetails {
 
     @Id
     @SequenceGenerator(
-        name = "app_users_seq_gen",
-        sequenceName = "app_users_seq",
+        name = "users_seq_gen",
+        sequenceName = "users_seq",
         allocationSize = 1
     )
     @GeneratedValue(
         strategy = GenerationType.SEQUENCE,
-        generator = "app_users_seq_gen"
+        generator = "users_seq_gen"
     )
     @Column(name = "id")
     private Long id;
 
     @Column(name = "username")
-    @NotNull
-    @Size(
-        min = 2,
-        max = 50
-    )
+    @NotBlank
+    @Size(max = 20)
     private String username;
 
     @Column(name = "password")
@@ -67,16 +62,16 @@ public class AppUser extends StatisticableEntity implements UserDetails {
 
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
-        name = "app_users_to_roles",
-        joinColumns = @JoinColumn(name = "app_user_id"),
-        inverseJoinColumns = @JoinColumn(name = "app_role_id")
+        name = "users_to_roles",
+        joinColumns = @JoinColumn(name = "user_id"),
+        inverseJoinColumns = @JoinColumn(name = "role_id")
     )
-    Set<AppRole> appRoles = new HashSet<>();
+    Set<Role> roles = new HashSet<>();
 
 
 
-    public AppUser() {}
-    public AppUser(
+    public User() {}
+    public User(
         String username,
         String email,
         String password
@@ -85,6 +80,7 @@ public class AppUser extends StatisticableEntity implements UserDetails {
         this.email = email;
         this.password = password;
     }
+
 
 
     @Override
@@ -129,6 +125,10 @@ public class AppUser extends StatisticableEntity implements UserDetails {
         return email;
     }
 
+    public Set<Role> getRoles(){
+        return  roles;
+    }
+
     public void setId(Long id) {
         this.id = id;
     }
@@ -143,6 +143,10 @@ public class AppUser extends StatisticableEntity implements UserDetails {
 
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    public void setRoles(Set<Role> roles){
+        this.roles = roles;
     }
 
 }

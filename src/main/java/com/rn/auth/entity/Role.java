@@ -4,32 +4,35 @@ import jakarta.persistence.*;
 
 @Entity
 @Table(name = "app_roles")
-public class AppRole {
+public class Role {
 
     @Id
     @SequenceGenerator(
-        name = "app_roles_seq_gen",
-        sequenceName = "app_roles_seq",
+        name = "roles_seq_gen",
+        sequenceName = "roles_seq",
         allocationSize = 1
     )
     @GeneratedValue(
         strategy = GenerationType.SEQUENCE,
-        generator = "app_roles_seq_gen"
+        generator = "roles_seq_gen"
     )
     @Column(name = "id")
     private Long id;
 
-
     @Column(name = "designation")
     @Enumerated(EnumType.STRING)
-    private EnumAppRole designation;
+    private EnumRole designation;
 
-    public AppRole() {}
-    public AppRole(
-        EnumAppRole designation
+
+
+    public Role() {}
+    public Role(
+        EnumRole designation
     ) {
         this.designation = designation;
     }
+
+
 
     public Long getId() {
         return id;
@@ -39,11 +42,11 @@ public class AppRole {
         this.id = id;
     }
 
-    public EnumAppRole getDesignation() {
+    public EnumRole getDesignation() {
         return designation;
     }
 
-    public void setDesignation(EnumAppRole designation) {
+    public void setDesignation(EnumRole designation) {
         this.designation = designation;
     }
 }
