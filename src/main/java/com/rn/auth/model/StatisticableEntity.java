@@ -1,4 +1,4 @@
-package com.rn.auth.entity;
+package com.rn.auth.model;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.EnumType;
@@ -10,7 +10,7 @@ import org.springframework.data.annotation.LastModifiedDate;
 import java.util.Date;
 
 @MappedSuperclass
-public class StatisticableEntity {
+public class StatisticableEntityImpl {
 
     @Column(
         name = "status",

@@ -5,10 +5,7 @@ import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.userdetails.UserDetails;
 
-import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -27,7 +24,7 @@ import java.util.Set;
         )
     }
 )
-public class User extends StatisticableEntity implements UserDetails {
+public class User extends StatisticableEntityImpl {
 
     @Id
     @SequenceGenerator(
@@ -83,26 +80,6 @@ public class User extends StatisticableEntity implements UserDetails {
 
 
 
-    @Override
-    public boolean isAccountNonExpired() {
-        return false;
-    }
-
-    @Override
-    public boolean isAccountNonLocked() {
-        return false;
-    }
-
-    @Override
-    public boolean isCredentialsNonExpired() {
-        return false;
-    }
-
-    @Override
-    public boolean isEnabled() {
-        return false;
-    }
-
     public Long getId() {
         return id;
     }
@@ -111,12 +88,6 @@ public class User extends StatisticableEntity implements UserDetails {
         return username;
     }
 
-    @Override
-    public Collection<? extends GrantedAuthority> getAuthorities() {
-        return null;
-    }
-
-    @Override
     public String getPassword() {
         return password;
     }

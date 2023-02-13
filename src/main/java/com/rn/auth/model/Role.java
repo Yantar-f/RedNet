@@ -3,7 +3,7 @@ package com.rn.auth.entity;
 import jakarta.persistence.*;
 
 @Entity
-@Table(name = "app_roles")
+@Table(name = "roles")
 public class Role {
 
     @Id
@@ -26,9 +26,7 @@ public class Role {
 
 
     public Role() {}
-    public Role(
-        EnumRole designation
-    ) {
+    public Role(EnumRole designation){
         this.designation = designation;
     }
 
