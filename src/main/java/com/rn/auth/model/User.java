@@ -1,4 +1,4 @@
-package com.rn.auth.entity;
+package com.rn.auth.model;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
@@ -24,7 +24,7 @@ import java.util.Set;
         )
     }
 )
-public class User extends StatisticableEntityImpl {
+public class User extends StatisticableEntity {
 
     @Id
     @SequenceGenerator(
@@ -67,6 +67,7 @@ public class User extends StatisticableEntityImpl {
 
 
 
+
     public User() {}
     public User(
         String username,
@@ -77,6 +78,7 @@ public class User extends StatisticableEntityImpl {
         this.email = email;
         this.password = password;
     }
+
 
 
 

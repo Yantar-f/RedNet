@@ -1,4 +1,4 @@
-package com.rn.auth.entity;
+package com.rn.auth.model;
 
 public enum EnumRole {
     USER,

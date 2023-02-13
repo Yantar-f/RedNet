@@ -10,7 +10,7 @@ import org.springframework.data.annotation.LastModifiedDate;
 import java.util.Date;
 
 @MappedSuperclass
-public class StatisticableEntityImpl {
+public class StatisticableEntity {
 
     @Column(
         name = "status",

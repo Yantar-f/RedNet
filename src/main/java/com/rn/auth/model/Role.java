@@ -1,4 +1,4 @@
-package com.rn.auth.entity;
+package com.rn.auth.model;
 
 import jakarta.persistence.*;
 
@@ -25,10 +25,12 @@ public class Role {
 
 
 
+
     public Role() {}
     public Role(EnumRole designation){
         this.designation = designation;
     }
+
 
 
 
