@@ -1,10 +1,12 @@
 package com.rn.auth.repository;
 
-import com.rn.auth.entity.EnumRole;
-import com.rn.auth.entity.Role;
+import com.rn.auth.model.EnumRole;
+import com.rn.auth.model.Role;
+import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
 
+@Repository
 public interface RoleRepository {
     Optional<Role> findByDesignation(EnumRole designation);
 
