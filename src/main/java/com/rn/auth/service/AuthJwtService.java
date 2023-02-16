@@ -29,9 +29,9 @@ public class AuthTokenServiceImpl implements AuthTokenService {
 
     public AuthTokenServiceImpl(
         @Value("${RedNet.app.authJwtSecretKey}")
-            String secretKey,
+        String secretKey,
         @Value("${RedNet.app.authJwtExpirationMs}")
-            int tokenExpirationMs
+        Integer tokenExpirationMs
     ) {
         this.secretKey = secretKey;
         this.tokenExpirationMs = tokenExpirationMs;
@@ -115,14 +115,15 @@ public class AuthTokenServiceImpl implements AuthTokenService {
     private boolean isTokenExpired(String token) {
         try {
             return extractExpiration(token).before(new Date(System.currentTimeMillis()));
-        } catch (Exception e) {
+        } catch (ClaimNotPresentException e) {
             return false;
         }
     }
 
     private Key getSigningKey() {
-        byte[] keyBytes = Decoders.BASE64.decode(secretKey);
-        return Keys.hmacShaKeyFor(keyBytes);
+        return Keys.hmacShaKeyFor(
+            Decoders.BASE64.decode(secretKey)
+        );
     }
 
 }
