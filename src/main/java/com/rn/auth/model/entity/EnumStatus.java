@@ -1,4 +1,4 @@
-package com.rn.auth.model;
+package com.rn.auth.model.entity;
 
 public enum EnumStatus {
     ACTIVE,

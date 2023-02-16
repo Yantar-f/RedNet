@@ -1,9 +1,17 @@
-package com.rn.auth.model;
+package com.rn.auth.model.entity;
 
 import jakarta.persistence.*;
 
 @Entity
-@Table(name = "roles")
+@Table(
+    name = "roles",
+    uniqueConstraints = {
+        @UniqueConstraint(
+            name = "designation_unique",
+            columnNames = "designation"
+        )
+    }
+)
 public class Role {
 
     @Id

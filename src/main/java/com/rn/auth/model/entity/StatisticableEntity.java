@@ -1,4 +1,4 @@
-package com.rn.auth.model;
+package com.rn.auth.model.entity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.EnumType;

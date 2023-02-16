@@ -1,14 +1,10 @@
-package com.rn.auth.model;
+package com.rn.auth.model.entity;
 
 import jakarta.persistence.*;
-import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Size;
+import jakarta.persistence.Entity;
 
 import java.util.HashSet;
 import java.util.Set;
-
 
 @Entity
 @Table(
@@ -24,7 +20,7 @@ import java.util.Set;
         )
     }
 )
-public class User extends StatisticableEntity {
+public class User /*extends StatisticableEntity */{
 
     @Id
     @SequenceGenerator(
@@ -40,24 +36,21 @@ public class User extends StatisticableEntity {
     private Long id;
 
     @Column(name = "username")
-    @NotBlank
-    @Size(max = 20)
     private String username;
 
     @Column(name = "password")
-    @NotNull
-    @Size(
-        min = 8,
-        max = 100
-    )
     private String password;
 
     @Column(name = "email")
-    @NotBlank
-    @Email
     private String email;
 
-    @ManyToMany(fetch = FetchType.EAGER)
+    @ManyToMany(
+        fetch = FetchType.EAGER,
+        cascade = {
+            CascadeType.PERSIST,
+            CascadeType.MERGE
+        }
+    )
     @JoinTable(
         name = "users_to_roles",
         joinColumns = @JoinColumn(name = "user_id"),
