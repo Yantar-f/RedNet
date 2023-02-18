@@ -78,12 +78,11 @@ public class AuthJwtService implements AuthTokenService {
 
     @Override
     public Claims extractAllClaims(String token) throws ClaimNotPresentException {
-        return Jwts
-            .parserBuilder()
-            .setSigningKey(getSigningKey())
-            .build()
-            .parseClaimsJws(token)
-            .getBody();
+        return Optional
+            .ofNullable(getJwtParser()
+                .parseClaimsJws(token)
+                .getBody())
+            .orElseThrow(ClaimNotPresentException::new);
     }
 
     @Override
