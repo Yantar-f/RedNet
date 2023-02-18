@@ -7,6 +7,8 @@ public class SignUpRequest {
     private String password;
 
 
+
+
     public SignUpRequest(
         String username,
         String email,
@@ -16,6 +18,8 @@ public class SignUpRequest {
         this.email = email;
         this.password = password;
     }
+
+
 
 
     public String getUsername() {

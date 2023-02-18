@@ -6,10 +6,14 @@ public class SignInRequest {
     private String password;
 
 
+
+
     public SignInRequest(String username, String password) {
         this.username = username;
         this.password = password;
     }
+
+
 
 
     public String getUsername() {

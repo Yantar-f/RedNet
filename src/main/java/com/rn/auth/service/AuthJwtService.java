@@ -3,7 +3,8 @@ package com.rn.auth.service;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
-import org.springframework.beans.factory.annotation.Value;
+import io.jsonwebtoken.security.SecurityException;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
@@ -17,33 +18,25 @@ import java.util.function.Function;
 @Service
 public class AuthJwtService implements AuthTokenService {
 
-
     private final String secretKey;
     private final Integer tokenExpirationMs;
+    private final SignatureAlgorithm signatureAlgorithm;
 
 
 
 
     public AuthJwtService(
-        @Value("${RedNet.app.authJwtSecretKey}") String secretKey,
-        @Value("${RedNet.app.authJwtExpirationMs}") Integer tokenExpirationMs
+        @Qualifier("authJwtSecretKey") String secretKey,
+        @Qualifier("authJwtExpirationMs") Integer tokenExpirationMs,
+        @Qualifier("authJwtSignatureAlgorithm") SignatureAlgorithm signatureAlgorithm
     ) {
         this.secretKey = secretKey;
         this.tokenExpirationMs = tokenExpirationMs;
+        this.signatureAlgorithm = signatureAlgorithm;
     }
 
 
 
-
-    @Override
-    public String extractSubject(String token) throws ClaimNotPresentException {
-        return extractClaim(token, Claims::getSubject);
-    }
-
-    @Override
-    public Date extractExpiration(String token) throws ClaimNotPresentException {
-        return extractClaim(token, Claims::getExpiration);
-    }
 
     @Override
     public String generateToken(UserDetails userDetails) {
@@ -60,34 +53,19 @@ public class AuthJwtService implements AuthTokenService {
             .setClaims(extraClaims)
             .setSubject(userDetails.getUsername())
             .setIssuedAt(new Date(System.currentTimeMillis()))
-            .setExpiration(new Date(System.currentTimeMillis() + tokenExpirationMs))
-            .signWith(getSigningKey(), SignatureAlgorithm.HS256)
+            .setExpiration(new Date(System.currentTimeMillis() + getTokenExpirationMs()))
+            .signWith(getSigningKey(), getSignatureAlgorithm())
             .compact();
     }
 
     @Override
-    public boolean isTokenValid(String token) {
-        JwtParser jwtParser = getJwtParser();
+    public String extractSubject(String token) throws ClaimNotPresentException {
+        return extractClaim(token, Claims::getSubject);
+    }
 
-        try {
-            String actualSignature = jwtParser
-                .parseClaimsJws(token)
-                .getSignature();
-
-            String expectedSignature = jwtParser
-                .parseClaimsJws(Jwts
-                    .builder()
-                    .setClaims(extractAllClaims(token))
-                    .signWith(getSigningKey(), SignatureAlgorithm.HS256)
-                    .compact())
-                .getSignature();
-
-            return
-                isTokenNotExpired(token) &&
-                actualSignature.equals(expectedSignature);
-        } catch (ClaimNotPresentException e) {
-            return false;
-        }
+    @Override
+    public Date extractExpiration(String token) throws ClaimNotPresentException {
+        return extractClaim(token, Claims::getExpiration);
     }
 
     @Override
@@ -108,14 +86,20 @@ public class AuthJwtService implements AuthTokenService {
             .getBody();
     }
 
-    private boolean isTokenNotExpired(String token) {
-        return !isTokenExpired(token);
-    }
+    @Override
+    public boolean isTokenValid(String token) {
+        JwtParser jwtParser = getJwtParser();
 
-    private boolean isTokenExpired(String token) {
         try {
-            return extractExpiration(token).before(new Date(System.currentTimeMillis()));
-        } catch (ClaimNotPresentException e) {
+            jwtParser.parseClaimsJws(token);
+            return true;
+        } catch (
+            SecurityException |
+            MalformedJwtException |
+            ExpiredJwtException |
+            UnsupportedJwtException |
+            IllegalArgumentException e
+        ) {
             return false;
         }
     }
@@ -129,8 +113,19 @@ public class AuthJwtService implements AuthTokenService {
 
     private Key getSigningKey() {
         return Keys.hmacShaKeyFor(
-            Decoders.BASE64.decode(secretKey)
+            Decoders.BASE64.decode(getSecretKey())
         );
     }
 
+    private String getSecretKey() {
+        return secretKey;
+    }
+
+    private Integer getTokenExpirationMs() {
+        return tokenExpirationMs;
+    }
+
+    private SignatureAlgorithm getSignatureAlgorithm() {
+        return signatureAlgorithm;
+    }
 }

@@ -6,9 +6,13 @@ public class SignInResponse {
 
 
 
+
     public SignInResponse(String token){
         this.token = token;
     }
+
+
+
 
     public String getToken(){
         return token;
