@@ -64,11 +64,6 @@ public class AuthJwtService implements AuthTokenService {
     }
 
     @Override
-    public Date extractExpiration(String token) throws ClaimNotPresentException {
-        return extractClaim(token, Claims::getExpiration);
-    }
-
-    @Override
     public <T> T extractClaim(String token, Function<Claims, T> claimsResolver) throws ClaimNotPresentException {
         final Claims claims = extractAllClaims(token);
         return Optional
@@ -93,10 +88,10 @@ public class AuthJwtService implements AuthTokenService {
             jwtParser.parseClaimsJws(token);
             return true;
         } catch (
-            SecurityException |
-            MalformedJwtException |
-            ExpiredJwtException |
             UnsupportedJwtException |
+            MalformedJwtException |
+            SecurityException |
+            ExpiredJwtException |
             IllegalArgumentException e
         ) {
             return false;

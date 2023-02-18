@@ -10,7 +10,6 @@ import java.util.function.Function;
 public interface AuthTokenService {
 
     String extractSubject(String token) throws ClaimNotPresentException;
-    Date extractExpiration(String token) throws ClaimNotPresentException;
     String generateToken(UserDetails userDetails);
     String generateToken(Map<String, Object> extraClaims, UserDetails userDetails);
     boolean isTokenValid(String token);
