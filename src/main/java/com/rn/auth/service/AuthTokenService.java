@@ -13,7 +13,7 @@ public interface AuthTokenService {
     Date extractExpiration(String token) throws ClaimNotPresentException;
     String generateToken(UserDetails userDetails);
     String generateToken(Map<String, Object> extraClaims, UserDetails userDetails);
-    boolean isTokenValid(String token, UserDetails userDetails);
+    boolean isTokenValid(String token);
     <T> T extractClaim(String token, Function<Claims, T> claimsResolver) throws ClaimNotPresentException;
-    Claims extractAllClaims(String token);
+    Claims extractAllClaims(String token) throws ClaimNotPresentException;
 }

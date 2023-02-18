@@ -1,8 +1,6 @@
 package com.rn.auth.service;
 
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Value;
@@ -67,17 +65,26 @@ public class AuthJwtService implements AuthTokenService {
             .compact();
     }
 
-    /*
-    Неправильная проверка валидоности токена (возможно), надо добавить проверку сигнатуры токена
-     */
     @Override
-    public boolean isTokenValid(String token, UserDetails userDetails) {
+    public boolean isTokenValid(String token) {
+        JwtParser jwtParser = getJwtParser();
+
         try {
-            final String tokenUsername = extractSubject(token);
-            final String userDetailsUsername = userDetails.getUsername();
+            String actualSignature = jwtParser
+                .parseClaimsJws(token)
+                .getSignature();
+
+            String expectedSignature = jwtParser
+                .parseClaimsJws(Jwts
+                    .builder()
+                    .setClaims(extractAllClaims(token))
+                    .signWith(getSigningKey(), SignatureAlgorithm.HS256)
+                    .compact())
+                .getSignature();
 
             return
-                tokenUsername.equals(userDetailsUsername) && isTokenNotExpired(token);
+                isTokenNotExpired(token) &&
+                actualSignature.equals(expectedSignature);
         } catch (ClaimNotPresentException e) {
             return false;
         }
@@ -92,7 +99,7 @@ public class AuthJwtService implements AuthTokenService {
     }
 
     @Override
-    public Claims extractAllClaims(String token) {
+    public Claims extractAllClaims(String token) throws ClaimNotPresentException {
         return Jwts
             .parserBuilder()
             .setSigningKey(getSigningKey())
@@ -100,9 +107,6 @@ public class AuthJwtService implements AuthTokenService {
             .parseClaimsJws(token)
             .getBody();
     }
-
-
-
 
     private boolean isTokenNotExpired(String token) {
         return !isTokenExpired(token);
@@ -114,6 +118,13 @@ public class AuthJwtService implements AuthTokenService {
         } catch (ClaimNotPresentException e) {
             return false;
         }
+    }
+
+    private JwtParser getJwtParser(){
+        return Jwts
+            .parserBuilder()
+            .setSigningKey(getSigningKey())
+            .build();
     }
 
     private Key getSigningKey() {
