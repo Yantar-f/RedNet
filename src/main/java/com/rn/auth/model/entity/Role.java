@@ -15,15 +15,7 @@ import jakarta.persistence.*;
 public class Role {
 
     @Id
-    @SequenceGenerator(
-        name = "roles_seq_gen",
-        sequenceName = "roles_seq",
-        allocationSize = 1
-    )
-    @GeneratedValue(
-        strategy = GenerationType.SEQUENCE,
-        generator = "roles_seq_gen"
-    )
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
     private Long id;
 

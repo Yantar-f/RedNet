@@ -23,15 +23,7 @@ import java.util.Set;
 public class User /*extends StatisticableEntity */{
 
     @Id
-    @SequenceGenerator(
-        name = "users_seq_gen",
-        sequenceName = "users_seq",
-        allocationSize = 1
-    )
-    @GeneratedValue(
-        strategy = GenerationType.SEQUENCE,
-        generator = "users_seq_gen"
-    )
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
     private Long id;
 
