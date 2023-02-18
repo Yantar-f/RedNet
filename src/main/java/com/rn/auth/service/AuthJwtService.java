@@ -16,9 +16,8 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.function.Function;
 
-
 @Service
-public class AuthTokenServiceImpl implements AuthTokenService {
+public class AuthJwtService implements AuthTokenService {
 
 
     private final String secretKey;
@@ -27,11 +26,9 @@ public class AuthTokenServiceImpl implements AuthTokenService {
 
 
 
-    public AuthTokenServiceImpl(
-        @Value("${RedNet.app.authJwtSecretKey}")
-        String secretKey,
-        @Value("${RedNet.app.authJwtExpirationMs}")
-        Integer tokenExpirationMs
+    public AuthJwtService(
+        @Value("${RedNet.app.authJwtSecretKey}") String secretKey,
+        @Value("${RedNet.app.authJwtExpirationMs}") Integer tokenExpirationMs
     ) {
         this.secretKey = secretKey;
         this.tokenExpirationMs = tokenExpirationMs;
@@ -42,16 +39,12 @@ public class AuthTokenServiceImpl implements AuthTokenService {
 
     @Override
     public String extractSubject(String token) throws ClaimNotPresentException {
-        return Optional
-            .ofNullable(extractClaim(token, Claims::getSubject))
-            .orElseThrow(() -> new ClaimNotPresentException("subject is not present"));
+        return extractClaim(token, Claims::getSubject);
     }
 
     @Override
     public Date extractExpiration(String token) throws ClaimNotPresentException {
-        return Optional
-            .ofNullable(extractClaim(token, Claims::getExpiration))
-            .orElseThrow(() -> new ClaimNotPresentException("expiration is not present"));
+        return extractClaim(token, Claims::getExpiration);
     }
 
     @Override
@@ -74,6 +67,9 @@ public class AuthTokenServiceImpl implements AuthTokenService {
             .compact();
     }
 
+    /*
+    Неправильная проверка валидоности токена (возможно), надо добавить проверку сигнатуры токена
+     */
     @Override
     public boolean isTokenValid(String token, UserDetails userDetails) {
         try {
