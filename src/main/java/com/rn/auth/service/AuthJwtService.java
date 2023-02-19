@@ -73,11 +73,9 @@ public class AuthJwtService implements AuthTokenService {
 
     @Override
     public Claims extractAllClaims(String token) throws ClaimNotPresentException {
-        return Optional
-            .ofNullable(getJwtParser()
-                .parseClaimsJws(token)
-                .getBody())
-            .orElseThrow(ClaimNotPresentException::new);
+        return getJwtParser()
+            .parseClaimsJws(token)
+            .getBody();
     }
 
     @Override
