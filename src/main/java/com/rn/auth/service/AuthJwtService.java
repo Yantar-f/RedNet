@@ -80,10 +80,8 @@ public class AuthJwtService implements AuthTokenService {
 
     @Override
     public boolean isTokenValid(String token) {
-        JwtParser jwtParser = getJwtParser();
-
         try {
-            jwtParser.parseClaimsJws(token);
+            getJwtParser().parseClaimsJws(token);
             return true;
         } catch (
             UnsupportedJwtException |
