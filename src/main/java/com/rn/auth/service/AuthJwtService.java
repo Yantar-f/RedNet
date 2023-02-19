@@ -72,7 +72,7 @@ public class AuthJwtService implements AuthTokenService {
     }
 
     @Override
-    public Claims extractAllClaims(String token) throws ClaimNotPresentException {
+    public Claims extractAllClaims(String token) {
         return getJwtParser()
             .parseClaimsJws(token)
             .getBody();
