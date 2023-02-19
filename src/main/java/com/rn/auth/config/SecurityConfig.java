@@ -1,7 +1,6 @@
 package com.rn.auth.config;
 
 import com.rn.auth.filter.AuthTokenFilter;
-import io.jsonwebtoken.SignatureAlgorithm;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -74,20 +73,5 @@ public class SecurityConfig {
     public PasswordEncoder passwordEncoder() {
         int strength = 10;
         return new BCryptPasswordEncoder(strength);
-    }
-
-    @Bean
-    public SignatureAlgorithm authJwtSignatureAlgorithm(){
-        return SignatureAlgorithm.HS256;
-    }
-
-    @Bean
-    public String authJwtSecretKey() {
-        return "67556B58703273357638792F423F4428472B4B6250655368566D597133743677";
-    }
-
-    @Bean
-    public Integer authJwtExpirationMs() {
-        return 1800000;
     }
 }
