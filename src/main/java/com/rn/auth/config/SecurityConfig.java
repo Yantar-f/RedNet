@@ -4,7 +4,6 @@ import com.rn.auth.filter.AuthTokenFilter;
 import com.rn.auth.model.entity.EnumRole;
 import com.rn.auth.model.entity.Role;
 import com.rn.auth.repository.RoleRepository;
-import io.jsonwebtoken.SignatureAlgorithm;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
