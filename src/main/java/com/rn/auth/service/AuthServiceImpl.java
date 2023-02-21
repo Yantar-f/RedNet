@@ -7,6 +7,7 @@ import com.rn.auth.model.entity.User;
 import com.rn.auth.model.payload.SignInRequest;
 import com.rn.auth.model.payload.SignInResponse;
 import com.rn.auth.model.payload.SignUpRequest;
+import com.rn.auth.repository.RoleRepository;
 import com.rn.auth.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -20,6 +21,7 @@ import java.util.Set;
 public class AuthServiceImpl implements AuthService {
 
     private final UserRepository userRepository;
+    private final RoleRepository roleRepository;
     private final PasswordEncoder passwordEncoder;
     private final AuthTokenService authTokenService;
     private final AuthenticationManager authenticationManager;
@@ -30,11 +32,13 @@ public class AuthServiceImpl implements AuthService {
     @Autowired
     private AuthServiceImpl(
         UserRepository userRepository,
+        RoleRepository roleRepository,
         PasswordEncoder passwordEncoder,
         AuthTokenService authTokenService,
         AuthenticationManager authenticationManager
     ) {
         this.userRepository = userRepository;
+        this.roleRepository = roleRepository;
         this.passwordEncoder = passwordEncoder;
         this.authTokenService = authTokenService;
         this.authenticationManager = authenticationManager;
@@ -46,7 +50,10 @@ public class AuthServiceImpl implements AuthService {
     @Override
     public SignInResponse signUp(SignUpRequest request) {
         User user = new User();
-        Role role = new Role(EnumRole.USER);
+        Role role = roleRepository
+            .findByDesignation(EnumRole.USER)
+            .orElseThrow();
+
         user.setUsername(request.getUsername());
         user.setEmail(request.getEmail());
         user.setPassword(passwordEncoder.encode(request.getPassword()));
@@ -66,7 +73,9 @@ public class AuthServiceImpl implements AuthService {
             )
         );
 
-        User user = userRepository.findByUsername(request.getUsername()).orElseThrow();
+        User user = userRepository
+            .findByUsername(request.getUsername())
+            .orElseThrow();
         String token = authTokenService.generateToken(new UserDetailsImpl(user));
 
         return new SignInResponse(token);

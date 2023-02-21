@@ -39,7 +39,6 @@ public class User /*extends StatisticableEntity */{
     @ManyToMany(
         fetch = FetchType.EAGER,
         cascade = {
-            CascadeType.PERSIST,
             CascadeType.MERGE
         }
     )
@@ -107,4 +106,7 @@ public class User /*extends StatisticableEntity */{
         this.roles = roles;
     }
 
+    public void addRole(Role role) {
+        roles.add(role);
+    }
 }

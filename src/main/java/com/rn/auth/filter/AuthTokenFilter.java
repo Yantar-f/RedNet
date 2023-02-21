@@ -86,7 +86,6 @@ public class AuthTokenFilter extends OncePerRequestFilter {
         ) {
             filterChain.doFilter(request,response);
         }
-
     }
 
 

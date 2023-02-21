@@ -1,6 +1,10 @@
 package com.rn.auth.config;
 
 import com.rn.auth.filter.AuthTokenFilter;
+import com.rn.auth.model.entity.EnumRole;
+import com.rn.auth.model.entity.Role;
+import com.rn.auth.repository.RoleRepository;
+import io.jsonwebtoken.SignatureAlgorithm;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -17,6 +21,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
+import java.util.Arrays;
+
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
@@ -30,10 +36,17 @@ public class SecurityConfig {
     @Autowired
     public SecurityConfig(
         UserDetailsService userDetailsService,
-        AuthTokenFilter authTokenFilter
+        AuthTokenFilter authTokenFilter,
+        RoleRepository roleRepository
     ) {
         this.userDetailsService = userDetailsService;
         this.authTokenFilter = authTokenFilter;
+
+        Arrays.stream(EnumRole.values()).forEach((role) -> {
+            if (!roleRepository.existsByDesignation(role)) {
+                roleRepository.save(new Role(role));
+            }
+        });
     }
 
 

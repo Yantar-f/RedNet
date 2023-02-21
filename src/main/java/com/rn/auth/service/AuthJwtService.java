@@ -4,7 +4,7 @@ import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import io.jsonwebtoken.security.SecurityException;
-import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
@@ -20,19 +20,17 @@ public class AuthJwtService implements AuthTokenService {
 
     private final String secretKey;
     private final Integer tokenExpirationMs;
-    private final SignatureAlgorithm signatureAlgorithm;
+    private final SignatureAlgorithm signatureAlgorithm = SignatureAlgorithm.HS256;
 
 
 
 
     public AuthJwtService(
-        @Qualifier("authJwtSecretKey") String secretKey,
-        @Qualifier("authJwtExpirationMs") Integer tokenExpirationMs,
-        @Qualifier("authJwtSignatureAlgorithm") SignatureAlgorithm signatureAlgorithm
+        @Value("${application.authJwtSecretKey}") String secretKey,
+        @Value("${application.authJwtExpirationMs}") Integer tokenExpirationMs
     ) {
         this.secretKey = secretKey;
         this.tokenExpirationMs = tokenExpirationMs;
-        this.signatureAlgorithm = signatureAlgorithm;
     }
 
 
