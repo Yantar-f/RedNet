@@ -38,9 +38,7 @@ public class User /*extends StatisticableEntity */{
 
     @ManyToMany(
         fetch = FetchType.EAGER,
-        cascade = {
-            CascadeType.MERGE
-        }
+        cascade = CascadeType.MERGE
     )
     @JoinTable(
         name = "users_to_roles",
