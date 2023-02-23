@@ -1,14 +1,22 @@
 package com.rn.auth.model.payload;
 
+import jakarta.validation.constraints.NotBlank;
+
 public class SignInRequest {
 
+    @NotBlank(message = "Username shouldn`t be blank")
     private String username;
+
+    @NotBlank(message = "Password shouldn`t be Blank")
     private String password;
 
 
 
 
-    public SignInRequest(String username, String password) {
+    public SignInRequest(
+        String username,
+        String password
+    ) {
         this.username = username;
         this.password = password;
     }

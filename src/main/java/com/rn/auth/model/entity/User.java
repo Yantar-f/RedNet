@@ -12,39 +12,42 @@ import java.util.Set;
     uniqueConstraints = {
         @UniqueConstraint(
             name = "username_unique",
-            columnNames = "username"
-        ),
+            columnNames = "username"),
         @UniqueConstraint(
             name = "email_unique",
-            columnNames = "email"
-        )
-    }
-)
-public class User /*extends StatisticableEntity */{
+            columnNames = "email")
+    })
+public class User /*extends StatisticableEntity*/ {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
     private Long id;
 
-    @Column(name = "username")
+    @Column(
+        name = "username",
+        nullable = false,
+        length = 60)
     private String username;
 
-    @Column(name = "password")
+    @Column(
+        name = "password",
+        nullable = false,
+        length = 80)
     private String password;
 
-    @Column(name = "email")
+    @Column(
+        name = "email",
+        nullable = false)
     private String email;
 
     @ManyToMany(
         fetch = FetchType.EAGER,
-        cascade = CascadeType.MERGE
-    )
+        cascade = CascadeType.MERGE)
     @JoinTable(
         name = "users_to_roles",
         joinColumns = @JoinColumn(name = "user_id"),
-        inverseJoinColumns = @JoinColumn(name = "role_id")
-    )
+        inverseJoinColumns = @JoinColumn(name = "role_id"))
     Set<Role> roles = new HashSet<>();
 
 

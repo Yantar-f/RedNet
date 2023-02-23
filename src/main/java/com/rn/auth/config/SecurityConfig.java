@@ -17,6 +17,7 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
@@ -28,6 +29,7 @@ public class SecurityConfig {
 
     private final UserDetailsService userDetailsService;
     private final AuthTokenFilter authTokenFilter;
+    private final AuthenticationEntryPoint unauthorizedHandler;
 
 
 
@@ -36,10 +38,12 @@ public class SecurityConfig {
     public SecurityConfig(
         UserDetailsService userDetailsService,
         AuthTokenFilter authTokenFilter,
+        AuthenticationEntryPoint unauthorizedHandler,
         RoleRepository roleRepository
     ) {
         this.userDetailsService = userDetailsService;
         this.authTokenFilter = authTokenFilter;
+        this.unauthorizedHandler = unauthorizedHandler;
 
         Arrays.stream(EnumRole.values()).forEach((role) -> {
             if (!roleRepository.existsByDesignation(role)) {
@@ -61,6 +65,8 @@ public class SecurityConfig {
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers("/api/auth/**").permitAll()
                 .anyRequest().authenticated())
+            .exceptionHandling(exHandle -> exHandle
+                .authenticationEntryPoint(unauthorizedHandler))
             .authenticationProvider(authenticationProvider())
             .addFilterBefore(authTokenFilter, UsernamePasswordAuthenticationFilter.class)
             .build();

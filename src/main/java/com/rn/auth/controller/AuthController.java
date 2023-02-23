@@ -1,10 +1,10 @@
 package com.rn.auth.controller;
 
 import com.rn.auth.model.payload.SignInRequest;
-import com.rn.auth.model.payload.SignInResponse;
 import com.rn.auth.model.payload.SignUpRequest;
 
 import com.rn.auth.service.AuthService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -27,12 +27,12 @@ public class AuthController {
 
 
     @PostMapping("/signup")
-    public ResponseEntity<SignInResponse> signUp(@RequestBody SignUpRequest request) {
+    public ResponseEntity<?> signUp(@RequestBody @Valid SignUpRequest request) {
         return ResponseEntity.ok(authService.signUp(request));
     }
 
     @PostMapping("/signin")
-    public ResponseEntity<SignInResponse> signIn(@RequestBody SignInRequest request) {
+    public ResponseEntity<?> signIn(@RequestBody @Valid SignInRequest request) {
         return ResponseEntity.ok(authService.signIn(request));
     }
 }

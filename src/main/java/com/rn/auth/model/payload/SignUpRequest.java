@@ -1,9 +1,22 @@
 package com.rn.auth.model.payload;
 
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
+
 public class SignUpRequest {
 
+    @NotBlank(message = "Username shouldn`t be blank")
+    @Size(max = 60, message = "Username shouldn`t be more than 60 chars")
     private String username;
+
+    @NotBlank(message = "Email shouldn`t be blank")
+    @Email(message = "Email should be valid")
     private String email;
+
+    @NotNull(message = "Password shouldn`t be null")
+    @Size(min = 8, max = 80, message = "Password should be between 8 and 80 chars")
     private String password;
 
 

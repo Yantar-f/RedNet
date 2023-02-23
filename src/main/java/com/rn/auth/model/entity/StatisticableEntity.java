@@ -14,8 +14,7 @@ public class StatisticableEntity {
 
     @Column(
         name = "status",
-        length = 30
-    )
+        length = 30)
     @Enumerated(EnumType.STRING)
     private EnumStatus status;
 
