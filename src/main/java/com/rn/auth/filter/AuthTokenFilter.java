@@ -57,10 +57,9 @@ public class AuthTokenFilter extends OncePerRequestFilter {
 
         try {
             final String token = header.substring(7);
+            SecurityContext securityContext = SecurityContextHolder.getContext();
 
             if(authTokenService.isTokenValid(token)) {
-                SecurityContext securityContext = SecurityContextHolder.getContext();
-
                 if (securityContext.getAuthentication() == null) {
                     final String username = authTokenService.extractSubject(token);
                     UserDetails userDetails = userDetailsService.loadUserByUsername(username);
@@ -76,6 +75,8 @@ public class AuthTokenFilter extends OncePerRequestFilter {
 
                     securityContext.setAuthentication(contextAuthToken);
                 }
+            } else {
+                securityContext.setAuthentication(null);
             }
 
             filterChain.doFilter(request,response);
