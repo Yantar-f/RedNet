@@ -56,12 +56,12 @@ public class AuthTokenFilter extends OncePerRequestFilter {
         }
 
         try {
-            SecurityContext securityContext = SecurityContextHolder.getContext();
+            final String token = header.substring(7);
 
-            if(securityContext.getAuthentication() == null) {
-                final String token = header.substring(7);
+            if(authTokenService.isTokenValid(token)) {
+                SecurityContext securityContext = SecurityContextHolder.getContext();
 
-                if (authTokenService.isTokenValid(token)) {
+                if (securityContext.getAuthentication() == null) {
                     final String username = authTokenService.extractSubject(token);
                     UserDetails userDetails = userDetailsService.loadUserByUsername(username);
 
