@@ -20,18 +20,18 @@ public class AuthControllerExceptionHandler {
         Integer status = ex.getStatusCode().value();
         Date timestamp = new Date();
         String path = request.getRequestURI();
-        List<String> errors = new LinkedList<>();
+        List<String> messages = new LinkedList<>();
         ex
             .getBindingResult()
             .getFieldErrors()
-            .forEach((fieldError) -> errors.add(fieldError.getDefaultMessage()));
+            .forEach((fieldError) -> messages.add(fieldError.getDefaultMessage()));
 
         return new ResponseEntity<>(
             new ErrorResponse(
                 status,
                 timestamp,
                 path,
-                errors),
+                messages),
             ex.getStatusCode());
     }
 }
