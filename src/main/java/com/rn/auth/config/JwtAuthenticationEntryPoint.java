@@ -32,8 +32,8 @@ public class JwtAuthenticationEntryPoint implements AuthenticationEntryPoint {
         Date timestamp = new Date();
         DateFormat dateFormat = new StdDateFormat();
         String path = request.getRequestURI();
-        List<String> errors = new LinkedList<>();
-        errors.add(authException.getMessage());
+        List<String> messages = new LinkedList<>();
+        messages.add(authException.getMessage());
 
         response.setContentType(MediaType.APPLICATION_JSON_VALUE);
         response.setStatus(status);
@@ -47,6 +47,6 @@ public class JwtAuthenticationEntryPoint implements AuthenticationEntryPoint {
                     status,
                     timestamp,
                     path,
-                    errors));
+                    messages));
     }
 }

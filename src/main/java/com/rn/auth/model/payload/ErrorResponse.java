@@ -7,7 +7,7 @@ public class ErrorResponse {
     private final Integer status;
     private final Date timestamp;
     private final String path;
-    private final List<String> errors;
+    private final List<String> messages;
 
 
 
@@ -16,12 +16,12 @@ public class ErrorResponse {
         Integer status,
         Date timestamp,
         String path,
-        List<String> errors
+        List<String> messages
     ) {
         this.status = status;
         this.timestamp = timestamp;
         this.path = path;
-        this.errors = errors;
+        this.messages = messages;
     }
 
 
@@ -39,7 +39,7 @@ public class ErrorResponse {
         return path;
     }
 
-    public List<String> getErrors() {
-        return errors;
+    public List<String> getMessages() {
+        return messages;
     }
 }
