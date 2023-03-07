@@ -3,7 +3,7 @@ package com.rn.auth.model.payload;
 import java.util.Date;
 import java.util.List;
 
-public class ErrorResponse {
+public class ErrorResponseBody {
     private final Integer status;
     private final Date timestamp;
     private final String path;
@@ -12,7 +12,7 @@ public class ErrorResponse {
 
 
 
-    public ErrorResponse(
+    public ErrorResponseBody(
         Integer status,
         Date timestamp,
         String path,

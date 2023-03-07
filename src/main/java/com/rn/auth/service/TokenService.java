@@ -9,8 +9,10 @@ import java.util.function.Function;
 public interface AuthTokenService {
 
     String extractSubject(String token) throws ClaimNotPresentException;
-    String generateToken(UserDetails userDetails);
-    String generateToken(Map<String, Object> extraClaims, UserDetails userDetails);
+    String generateAccessToken(UserDetails userDetails);
+    String generateAccessToken(Map<String, Object> extraClaims, UserDetails userDetails);
+    String generateRefreshToken(UserDetails userDetails);
+    String generateRefreshToken(Map<String, Object> extraClaims, UserDetails userDetails);
     boolean isTokenValid(String token);
     <T> T extractClaim(String token, Function<Claims, T> claimsResolver) throws ClaimNotPresentException;
     Claims extractAllClaims(String token);

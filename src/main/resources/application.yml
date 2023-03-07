@@ -1,0 +1,39 @@
+server:
+  port: 8080
+  error:
+    include-message: always
+    include-binding-errors: always
+
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/RedNetDB
+    username: postgres
+    password: 123
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    database: postgresql
+    open-in-view: false
+    show-sql: true
+    hibernate:
+      ddl-auto: create-drop
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        format_sql: true
+        enable_lazy_load_no_trans: false
+        jakarta:
+          persistence:
+            sharedCache:
+              mode: ENABLE_SELECTIVE
+
+RedNet:
+  app:
+    passwordEncoderStrength: 10
+    accessTokenCookieName: rednet-jwt-access
+    accessTokenExpirationMs: 1800000
+    accessTokenPath: /api
+    refreshTokenCookieName: rednet-jwt-refresh
+    refreshTokenExpirationMs: 180000000
+    refreshTokenPath: /api/auth/refresh
+    jwt:
+      secretKey: 67556B58703273357638792F423F4428472B4B6250655368566D597133743677

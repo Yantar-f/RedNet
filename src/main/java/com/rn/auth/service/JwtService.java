@@ -19,41 +19,55 @@ import java.util.function.Function;
 public class AuthJwtService implements AuthTokenService {
 
     private final String secretKey;
-    private final Integer tokenExpirationMs;
+    private final Integer accessTokenExpirationMs;
+    private final Integer refreshTokenExpirationMs;
     private final SignatureAlgorithm signatureAlgorithm = SignatureAlgorithm.HS256;
 
 
 
 
     public AuthJwtService(
-        @Value("${application.authJwtSecretKey}") String secretKey,
-        @Value("${application.authJwtExpirationMs}") Integer tokenExpirationMs
+        @Value("${RedNet.app.jwt.secretKey}") String secretKey,
+        @Value("${RedNet.app.accessTokenExpirationMs}") Integer accessTokenExpirationMs,
+        @Value("${RedNet.app.refreshTokenExpirationMs}") Integer refreshTokenExpirationMs
     ) {
         this.secretKey = secretKey;
-        this.tokenExpirationMs = tokenExpirationMs;
+        this.accessTokenExpirationMs = accessTokenExpirationMs;
+        this.refreshTokenExpirationMs = refreshTokenExpirationMs;
     }
 
 
 
 
     @Override
-    public String generateToken(UserDetails userDetails) {
-        return generateToken(new HashMap<>(),userDetails);
+    public String generateAccessToken(UserDetails userDetails) {
+        return generateAccessToken(new HashMap<>(),userDetails);
     }
 
     @Override
-    public String generateToken(
+    public String generateAccessToken(
         Map<String, Object> extraClaims,
         UserDetails userDetails
     ) {
-        return Jwts
-            .builder()
+        return getInitialBuilder()
             .setClaims(extraClaims)
             .setSubject(userDetails.getUsername())
-            .setIssuedAt(new Date(System.currentTimeMillis()))
-            .setExpiration(new Date(System.currentTimeMillis() + getTokenExpirationMs()))
-            .signWith(getSigningKey(), getSignatureAlgorithm())
+            .setExpiration(new Date(System.currentTimeMillis() + getAccessTokenExpirationMs()))
             .compact();
+    }
+
+    @Override
+    public String generateRefreshToken(UserDetails userDetails) {
+        return generateRefreshToken(new HashMap<>(),userDetails);
+    }
+
+    @Override
+    public String generateRefreshToken(Map<String, Object> extraClaims, UserDetails userDetails) {
+        return getInitialBuilder()
+                .setClaims(extraClaims)
+                .setSubject(userDetails.getUsername())
+                .setExpiration(new Date(System.currentTimeMillis() + getRefreshTokenExpirationMs()))
+                .compact();
     }
 
     @Override
@@ -94,7 +108,12 @@ public class AuthJwtService implements AuthTokenService {
 
 
 
-
+    private JwtBuilder getInitialBuilder(){
+        return Jwts
+                .builder()
+                .signWith(getSigningKey(), getSignatureAlgorithm())
+                .setIssuedAt(new Date(System.currentTimeMillis()));
+    }
 
     private JwtParser getJwtParser(){
         return Jwts
@@ -113,8 +132,11 @@ public class AuthJwtService implements AuthTokenService {
         return secretKey;
     }
 
-    private Integer getTokenExpirationMs() {
-        return tokenExpirationMs;
+    private Integer getAccessTokenExpirationMs() {
+        return accessTokenExpirationMs;
+    }
+    private Integer getRefreshTokenExpirationMs() {
+        return refreshTokenExpirationMs;
     }
 
     private SignatureAlgorithm getSignatureAlgorithm() {

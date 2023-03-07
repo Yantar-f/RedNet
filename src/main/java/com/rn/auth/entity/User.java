@@ -11,23 +11,13 @@ import java.util.Set;
     name = "users",
     uniqueConstraints = {
         @UniqueConstraint(
-            name = "username_unique",
-            columnNames = "username"),
-        @UniqueConstraint(
             name = "email_unique",
             columnNames = "email")
     })
 public class User /*extends StatisticableEntity*/ {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id")
-    private Long id;
-
-    @Column(
-        name = "username",
-        nullable = false,
-        length = 60)
+    @Column(name = "username")
     private String username;
 
     @Column(
@@ -53,7 +43,10 @@ public class User /*extends StatisticableEntity*/ {
 
 
 
-    public User() {}
+    protected User() {}
+    public User (String username) {
+        this.username = username;
+    }
     public User(
         String username,
         String email,
@@ -66,10 +59,6 @@ public class User /*extends StatisticableEntity*/ {
 
 
 
-
-    public Long getId() {
-        return id;
-    }
 
     public String getUsername() {
         return username;
@@ -85,10 +74,6 @@ public class User /*extends StatisticableEntity*/ {
 
     public Set<Role> getRoles(){
         return  roles;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
     }
 
     public void setUsername(String username) {

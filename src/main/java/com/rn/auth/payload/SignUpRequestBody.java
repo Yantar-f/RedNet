@@ -5,7 +5,7 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 
-public class SignUpRequest {
+public class SignUpRequestBody {
 
     @NotBlank(message = "Username shouldn`t be blank")
     @Size(max = 60, message = "Username shouldn`t be more than 60 chars")
@@ -22,7 +22,7 @@ public class SignUpRequest {
 
 
 
-    public SignUpRequest(
+    public SignUpRequestBody(
         String username,
         String email,
         String password

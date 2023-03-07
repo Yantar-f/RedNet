@@ -2,7 +2,7 @@ package com.rn.auth.model.payload;
 
 import jakarta.validation.constraints.NotBlank;
 
-public class SignInRequest {
+public class SignInRequestBody {
 
     @NotBlank(message = "Username shouldn`t be blank")
     private String username;
@@ -13,7 +13,7 @@ public class SignInRequest {
 
 
 
-    public SignInRequest(
+    public SignInRequestBody(
         String username,
         String password
     ) {
