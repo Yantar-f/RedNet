@@ -1,9 +1,10 @@
 package com.rn.auth.controller;
 
-import com.rn.auth.model.payload.SignInRequest;
-import com.rn.auth.model.payload.SignUpRequest;
+import com.rn.auth.payload.SignInRequestBody;
+import com.rn.auth.payload.SignUpRequestBody;
 
 import com.rn.auth.service.AuthService;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -27,12 +28,22 @@ public class AuthController {
 
 
     @PostMapping("/signup")
-    public ResponseEntity<?> signUp(@RequestBody @Valid SignUpRequest request) {
-        return ResponseEntity.ok(authService.signUp(request));
+    public ResponseEntity<?> signUp(@RequestBody @Valid SignUpRequestBody request) {
+        return authService.signUp(request);
     }
 
     @PostMapping("/signin")
-    public ResponseEntity<?> signIn(@RequestBody @Valid SignInRequest request) {
-        return ResponseEntity.ok(authService.signIn(request));
+    public ResponseEntity<?> signIn(@RequestBody @Valid SignInRequestBody request) {
+        return authService.signIn(request);
+    }
+
+    @PostMapping("/signout")
+    public ResponseEntity<?> signOut(HttpServletRequest request) {
+        return authService.signOut(request);
+    }
+
+    @PostMapping("/refresh")
+    public ResponseEntity<?> refresh(HttpServletRequest request) {
+        return authService.refresh(request);
     }
 }

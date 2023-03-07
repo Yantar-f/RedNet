@@ -8,10 +8,19 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/test")
 public class TestController {
 
-
     @GetMapping
-    public Object entry(){
+    public Object entry() {
         return new Response("done");
+    }
+
+    @GetMapping("/admin")
+    public Object adminEntry(){
+        return new Response("admin done");
+    }
+
+    @GetMapping("/user")
+    public Object userEntry(){
+        return new Response("user done");
     }
 
 

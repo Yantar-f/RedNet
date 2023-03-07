@@ -1,6 +1,6 @@
 package com.rn.auth.controller;
 
-import com.rn.auth.model.payload.ErrorResponse;
+import com.rn.auth.payload.ErrorResponseBody;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -13,7 +13,7 @@ import java.util.*;
 public class AuthControllerExceptionHandler {
 
     @ExceptionHandler(value = MethodArgumentNotValidException.class)
-    public ResponseEntity<ErrorResponse> handleMethodArgumentNotValid(
+    public ResponseEntity<ErrorResponseBody> handleMethodArgumentNotValid(
         MethodArgumentNotValidException ex,
         HttpServletRequest request
     ) {
@@ -21,17 +21,18 @@ public class AuthControllerExceptionHandler {
         Date timestamp = new Date();
         String path = request.getRequestURI();
         List<String> messages = new LinkedList<>();
-        ex
-            .getBindingResult()
-            .getFieldErrors()
-            .forEach((fieldError) -> messages.add(fieldError.getDefaultMessage()));
+        ex.getBindingResult().getFieldErrors().forEach((fieldError) ->
+            messages.add(fieldError.getDefaultMessage())
+        );
 
         return new ResponseEntity<>(
-            new ErrorResponse(
+            new ErrorResponseBody(
                 status,
                 timestamp,
                 path,
-                messages),
-            ex.getStatusCode());
+                messages
+            ),
+            ex.getStatusCode()
+        );
     }
 }

@@ -16,7 +16,7 @@ import java.util.Optional;
 import java.util.function.Function;
 
 @Service
-public class AuthJwtService implements AuthTokenService {
+public class JwtService implements TokenService {
 
     private final String secretKey;
     private final Integer accessTokenExpirationMs;
@@ -26,7 +26,7 @@ public class AuthJwtService implements AuthTokenService {
 
 
 
-    public AuthJwtService(
+    public JwtService(
         @Value("${RedNet.app.jwt.secretKey}") String secretKey,
         @Value("${RedNet.app.accessTokenExpirationMs}") Integer accessTokenExpirationMs,
         @Value("${RedNet.app.refreshTokenExpirationMs}") Integer refreshTokenExpirationMs
@@ -132,10 +132,10 @@ public class AuthJwtService implements AuthTokenService {
         return secretKey;
     }
 
-    private Integer getAccessTokenExpirationMs() {
+    public Integer getAccessTokenExpirationMs() {
         return accessTokenExpirationMs;
     }
-    private Integer getRefreshTokenExpirationMs() {
+    public Integer getRefreshTokenExpirationMs() {
         return refreshTokenExpirationMs;
     }
 

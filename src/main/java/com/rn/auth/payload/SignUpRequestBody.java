@@ -1,4 +1,4 @@
-package com.rn.auth.model.payload;
+package com.rn.auth.payload;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;

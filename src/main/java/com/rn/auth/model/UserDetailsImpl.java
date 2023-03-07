@@ -1,6 +1,6 @@
 package com.rn.auth.model;
 
-import com.rn.auth.model.entity.User;
+import com.rn.auth.entity.User;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -18,9 +18,7 @@ public class UserDetailsImpl implements UserDetails {
 
     public UserDetailsImpl(User user){
         this.user = user;
-        grantedAuthorities = user
-            .getRoles()
-            .stream()
+        grantedAuthorities = user.getRoles().stream()
             .map(role -> new SimpleGrantedAuthority(role.getDesignation().name()))
             .toList();
     }

@@ -1,4 +1,4 @@
-package com.rn.auth.model.payload;
+package com.rn.auth.payload;
 
 import java.util.Date;
 import java.util.List;

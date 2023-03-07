@@ -1,10 +1,11 @@
 package com.rn.auth.config;
 
 import com.rn.auth.filter.AuthTokenFilter;
-import com.rn.auth.model.entity.EnumRole;
-import com.rn.auth.model.entity.Role;
+import com.rn.auth.entity.EnumRole;
+import com.rn.auth.entity.Role;
 import com.rn.auth.repository.RoleRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -29,7 +30,8 @@ public class SecurityConfig {
 
     private final UserDetailsService userDetailsService;
     private final AuthTokenFilter authTokenFilter;
-    private final AuthenticationEntryPoint unauthorizedHandler;
+    private final AuthenticationEntryPoint authenticationEntryPoint;
+    private final Integer passwordEncoderStrength;
 
 
 
@@ -38,12 +40,14 @@ public class SecurityConfig {
     public SecurityConfig(
         UserDetailsService userDetailsService,
         AuthTokenFilter authTokenFilter,
-        AuthenticationEntryPoint unauthorizedHandler,
-        RoleRepository roleRepository
+        AuthenticationEntryPoint authenticationEntryPoint,
+        RoleRepository roleRepository,
+        @Value("${RedNet.app.passwordEncoderStrength}") Integer passwordEncoderStrength
     ) {
         this.userDetailsService = userDetailsService;
         this.authTokenFilter = authTokenFilter;
-        this.unauthorizedHandler = unauthorizedHandler;
+        this.authenticationEntryPoint = authenticationEntryPoint;
+        this.passwordEncoderStrength = passwordEncoderStrength;
 
         Arrays.stream(EnumRole.values()).forEach((role) -> {
             if (!roleRepository.existsByDesignation(role)) {
@@ -64,9 +68,11 @@ public class SecurityConfig {
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers("/api/auth/**").permitAll()
+                .requestMatchers("/api/test/admin").hasAuthority(EnumRole.ADMIN.name())
+                .requestMatchers("/api/test/user").hasAuthority(EnumRole.USER.name())
                 .anyRequest().authenticated())
             .exceptionHandling(exHandle -> exHandle
-                .authenticationEntryPoint(unauthorizedHandler))
+                .authenticationEntryPoint(authenticationEntryPoint))
             .authenticationProvider(authenticationProvider())
             .addFilterBefore(authTokenFilter, UsernamePasswordAuthenticationFilter.class)
             .build();
@@ -88,7 +94,6 @@ public class SecurityConfig {
 
     @Bean
     public PasswordEncoder passwordEncoder() {
-        int strength = 10;
-        return new BCryptPasswordEncoder(strength);
+        return new BCryptPasswordEncoder(passwordEncoderStrength);
     }
 }

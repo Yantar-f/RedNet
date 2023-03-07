@@ -6,9 +6,11 @@ import org.springframework.security.core.userdetails.UserDetails;
 import java.util.Map;
 import java.util.function.Function;
 
-public interface AuthTokenService {
+public interface TokenService {
 
     String extractSubject(String token) throws ClaimNotPresentException;
+    Integer getAccessTokenExpirationMs();
+    Integer getRefreshTokenExpirationMs();
     String generateAccessToken(UserDetails userDetails);
     String generateAccessToken(Map<String, Object> extraClaims, UserDetails userDetails);
     String generateRefreshToken(UserDetails userDetails);

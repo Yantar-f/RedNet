@@ -1,4 +1,4 @@
-package com.rn.auth.model.entity;
+package com.rn.auth.entity;
 
 import jakarta.persistence.*;
 

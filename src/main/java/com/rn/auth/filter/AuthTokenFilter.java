@@ -1,6 +1,6 @@
 package com.rn.auth.filter;
 
-import com.rn.auth.service.AuthTokenService;
+import com.rn.auth.service.TokenService;
 import com.rn.auth.service.ClaimNotPresentException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -24,7 +24,7 @@ import java.io.IOException;
 @Component
 public class AuthTokenFilter extends OncePerRequestFilter {
 
-    private final AuthTokenService authTokenService;
+    private final TokenService tokenService;
     private final UserDetailsService userDetailsService;
 
 
@@ -32,10 +32,10 @@ public class AuthTokenFilter extends OncePerRequestFilter {
 
     @Autowired
     public AuthTokenFilter(
-        AuthTokenService authTokenService,
+        TokenService tokenService,
         UserDetailsService userDetailsService
     ) {
-        this.authTokenService = authTokenService;
+        this.tokenService = tokenService;
         this.userDetailsService = userDetailsService;
     }
 
@@ -57,11 +57,12 @@ public class AuthTokenFilter extends OncePerRequestFilter {
 
         try {
             final String token = header.substring(7);
-            SecurityContext securityContext = SecurityContextHolder.getContext();
 
-            if(authTokenService.isTokenValid(token)) {
+            if(tokenService.isTokenValid(token)) {
+                SecurityContext securityContext = SecurityContextHolder.getContext();
+
                 if (securityContext.getAuthentication() == null) {
-                    final String username = authTokenService.extractSubject(token);
+                    final String username = tokenService.extractSubject(token);
                     UserDetails userDetails = userDetailsService.loadUserByUsername(username);
 
                     UsernamePasswordAuthenticationToken contextAuthToken =
@@ -75,8 +76,6 @@ public class AuthTokenFilter extends OncePerRequestFilter {
 
                     securityContext.setAuthentication(contextAuthToken);
                 }
-            } else {
-                securityContext.setAuthentication(null);
             }
 
             filterChain.doFilter(request,response);

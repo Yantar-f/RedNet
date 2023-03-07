@@ -1,6 +1,6 @@
 package com.rn.auth.repository;
 
-import com.rn.auth.model.entity.User;
+import com.rn.auth.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

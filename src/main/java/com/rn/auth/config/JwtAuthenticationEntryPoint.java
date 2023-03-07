@@ -2,7 +2,7 @@ package com.rn.auth.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.util.StdDateFormat;
-import com.rn.auth.model.payload.ErrorResponse;
+import com.rn.auth.payload.ErrorResponseBody;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -27,8 +27,7 @@ public class JwtAuthenticationEntryPoint implements AuthenticationEntryPoint {
         HttpServletResponse response,
         AuthenticationException authException
     ) throws IOException, ServletException {
-        HttpStatus httpStatus = HttpStatus.UNAUTHORIZED;
-        Integer status = httpStatus.value();
+        Integer status = HttpStatus.UNAUTHORIZED.value();
         Date timestamp = new Date();
         DateFormat dateFormat = new StdDateFormat();
         String path = request.getRequestURI();
@@ -43,10 +42,12 @@ public class JwtAuthenticationEntryPoint implements AuthenticationEntryPoint {
             .setDateFormat(dateFormat)
             .writeValue(
                 response.getOutputStream(),
-                new ErrorResponse(
+                new ErrorResponseBody(
                     status,
                     timestamp,
                     path,
-                    messages));
+                    messages
+                )
+            );
     }
 }
