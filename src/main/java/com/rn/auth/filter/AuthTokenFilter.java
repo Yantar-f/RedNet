@@ -1,13 +1,13 @@
 package com.rn.auth.filter;
 
 import com.rn.auth.service.TokenService;
-import com.rn.auth.service.ClaimNotPresentException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpHeaders;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.lang.NonNull;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContext;
@@ -20,12 +20,14 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
+import java.util.Arrays;
 
 @Component
 public class AuthTokenFilter extends OncePerRequestFilter {
 
     private final TokenService tokenService;
     private final UserDetailsService userDetailsService;
+    private final String accessTokenCookieName;
 
 
 
@@ -33,10 +35,12 @@ public class AuthTokenFilter extends OncePerRequestFilter {
     @Autowired
     public AuthTokenFilter(
         TokenService tokenService,
-        UserDetailsService userDetailsService
+        UserDetailsService userDetailsService,
+        @Value("${RedNet.app.accessTokenCookieName}") String accessTokenCookieName
     ) {
         this.tokenService = tokenService;
         this.userDetailsService = userDetailsService;
+        this.accessTokenCookieName = accessTokenCookieName;
     }
 
 
@@ -48,21 +52,31 @@ public class AuthTokenFilter extends OncePerRequestFilter {
         @NonNull HttpServletResponse response,
         @NonNull FilterChain filterChain
     ) throws ServletException, IOException {
-        final String header = request.getHeader(HttpHeaders.AUTHORIZATION);
 
-        if (isAuthHeaderNotContainsToken(header)) {
+        Cookie[] cookies = request.getCookies();
+
+        if (cookies == null) {
             filterChain.doFilter(request,response);
             return;
         }
 
-        try {
-            final String token = header.substring(7);
+        Cookie accessTokenCookie = Arrays.stream(cookies)
+            .filter(cookie -> cookie.getName().equals(accessTokenCookieName))
+            .findFirst().orElse(null);
 
-            if(tokenService.isTokenValid(token)) {
+        if (accessTokenCookie == null) {
+            filterChain.doFilter(request,response);
+            return;
+        }
+
+        final String accessToken = accessTokenCookie.getValue();
+
+        try {
+            if(tokenService.isTokenValid(accessToken)) {
                 SecurityContext securityContext = SecurityContextHolder.getContext();
 
                 if (securityContext.getAuthentication() == null) {
-                    final String username = tokenService.extractSubject(token);
+                    final String username = tokenService.extractSubject(accessToken);
                     UserDetails userDetails = userDetailsService.loadUserByUsername(username);
 
                     UsernamePasswordAuthenticationToken contextAuthToken =
@@ -80,17 +94,9 @@ public class AuthTokenFilter extends OncePerRequestFilter {
 
             filterChain.doFilter(request,response);
         } catch (
-            ClaimNotPresentException |
             UsernameNotFoundException e
         ) {
             filterChain.doFilter(request,response);
         }
-    }
-
-
-
-
-    private boolean isAuthHeaderNotContainsToken(String header) {
-        return header == null || !header.startsWith("Bearer ");
     }
 }

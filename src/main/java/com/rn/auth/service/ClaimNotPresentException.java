@@ -1,6 +1,6 @@
 package com.rn.auth.service;
 
-public class ClaimNotPresentException extends Exception {
+public class ClaimNotPresentException extends RuntimeException {
 
     public ClaimNotPresentException(){
         super("");

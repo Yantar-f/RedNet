@@ -1,23 +1,32 @@
 package com.rn.auth.entity;
 
-import jakarta.persistence.*;
+
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.JoinTable;
+import jakarta.persistence.ManyToMany;
+import jakarta.persistence.Table;
+import jakarta.persistence.UniqueConstraint;
 
 import java.util.HashSet;
 import java.util.Set;
 
 @Entity
-@Table(
+@Table (
     name = "users",
     uniqueConstraints = {
-        @UniqueConstraint(
+        @UniqueConstraint (
             name = "email_unique",
             columnNames = "email")
     })
 public class User /*extends StatisticableEntity*/ {
 
     @Id
-    @Column(name = "username")
+    @Column (name = "username")
     private String username;
 
     @Column(
@@ -31,12 +40,12 @@ public class User /*extends StatisticableEntity*/ {
         nullable = false)
     private String email;
 
-    @ManyToMany(
+    @ManyToMany (
         fetch = FetchType.EAGER,
         cascade = CascadeType.MERGE)
-    @JoinTable(
+    @JoinTable (
         name = "users_to_roles",
-        joinColumns = @JoinColumn(name = "user_id"),
+        joinColumns = @JoinColumn (name = "user_id"),
         inverseJoinColumns = @JoinColumn(name = "role_id"))
     Set<Role> roles = new HashSet<>();
 

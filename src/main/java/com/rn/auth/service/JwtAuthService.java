@@ -12,6 +12,7 @@ import com.rn.auth.payload.SignUpRequestBody;
 import com.rn.auth.repository.RefreshTokenRepository;
 import com.rn.auth.repository.RoleRepository;
 import com.rn.auth.repository.UserRepository;
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -21,11 +22,13 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
@@ -77,8 +80,12 @@ public class JwtAuthService implements AuthService {
 
     @Override
     public ResponseEntity<SignInResponseBody> signUp(SignUpRequestBody requestBody) {
+        if (userRepository.existsByUsername(requestBody.getUsername())) {
+            throw new OccupiedUsernameException(requestBody.getUsername());
+        } else if(userRepository.existsByEmail(requestBody.getEmail())) {
+            throw new OccupiedEmailException(requestBody.getEmail());
+        }
 
-        //if username exists????///
         User user = new User(
             requestBody.getUsername(),
             requestBody.getEmail(),
@@ -90,18 +97,21 @@ public class JwtAuthService implements AuthService {
         user.setRoles(Set.of(role));
 
         userRepository.save(user);
+        UserDetails userDetails = new UserDetailsImpl(user);
 
         Authentication authentication = authenticationManager.authenticate(
             new UsernamePasswordAuthenticationToken(
-                requestBody.getUsername(),
-                requestBody.getPassword()));
+                userDetails,
+                requestBody.getPassword(),
+                userDetails.getAuthorities()
+            )
+        );
 
         SecurityContextHolder.getContext().setAuthentication(authentication);
 
-        UserDetails userDetails = new UserDetailsImpl(user);
         String accessToken = tokenService.generateAccessToken(userDetails);
         String refreshToken = tokenService.generateRefreshToken(userDetails);
-        RefreshToken refreshTokenEntity = new RefreshToken(refreshToken);
+        RefreshToken refreshTokenEntity = new RefreshToken(refreshToken,user);
 
         refreshTokenRepository.save(refreshTokenEntity);
 
@@ -114,32 +124,33 @@ public class JwtAuthService implements AuthService {
                 HttpHeaders.SET_COOKIE,
                 generateRefreshCookie(refreshToken).toString()
             )
-            .body(new SignInResponseBody(List.of(role.getDesignation().name())));
+            .body(new SignInResponseBody(requestBody.getUsername(),List.of(role.getDesignation().name())));
     }
 
     @Override
     public ResponseEntity<SignInResponseBody> signIn(SignInRequestBody requestBody) {
+        User user = userRepository.findByUsername(requestBody.getUsername())
+            .orElseThrow(InvalidPasswordOrUsernameException::new);
+
+        UserDetails userDetails = new UserDetailsImpl(user);
         Authentication authentication = authenticationManager.authenticate(
             new UsernamePasswordAuthenticationToken(
-                requestBody.getUsername(),
-                requestBody.getPassword()));
+                userDetails,
+                requestBody.getPassword(),
+                userDetails.getAuthorities()
+            )
+        );
 
         SecurityContextHolder.getContext().setAuthentication(authentication);
 
-        User user = userRepository
-            .findByUsername(requestBody.getUsername())
-            .orElseThrow();
-        List<String> roles = user
-            .getRoles()
-            .stream()
-            .map(role -> role.getDesignation().name()).toList();
-        UserDetails userDetails = new UserDetailsImpl(user);
         String accessToken = tokenService.generateAccessToken(userDetails);
-        String refreshToken = tokenService.generateRefreshToken(userDetails);
-
-        ////////////////////////////////////////////////
-        ////////////////////////////////////////////////
-        ////////////////////////////////////////////////
+        String refreshToken = refreshTokenRepository.findByUser(user)
+            .orElseGet(() -> {
+                RefreshToken refreshTokenEntity = new RefreshToken(tokenService.generateRefreshToken(userDetails),user);
+                refreshTokenRepository.save(refreshTokenEntity);
+                return refreshTokenEntity;
+            })
+            .getToken();
 
         return ResponseEntity.ok()
             .header(
@@ -150,35 +161,58 @@ public class JwtAuthService implements AuthService {
                 HttpHeaders.SET_COOKIE,
                 generateRefreshCookie(refreshToken).toString()
             )
-            .body(new SignInResponseBody(roles));
+            .body(
+                new SignInResponseBody(
+                    userDetails.getUsername(),
+                    userDetails.getAuthorities().stream()
+                        .map(GrantedAuthority::getAuthority)
+                        .toList()
+                )
+            );
     }
 
     @Override
     public ResponseEntity<SimpleResponseBody> signOut(HttpServletRequest request) {
-        ////////////////////////////////////////////////
-        ////////////////////////////////////////////////
-        ////////////////////////////////////////////////
-
+        SecurityContextHolder.getContext().setAuthentication(null);
         return ResponseEntity.ok()
             .header(
                 HttpHeaders.SET_COOKIE,
-                generateCleaningCookie(accessTokenCookieName).toString()
+                generateCleaningCookie(accessTokenCookieName,accessTokenPath).toString()
             )
             .header(
                 HttpHeaders.SET_COOKIE,
-                generateCleaningCookie(refreshTokenCookieName).toString()
+                generateCleaningCookie(refreshTokenCookieName,refreshTokenPath).toString()
             )
             .body(new SimpleResponseBody("signout success"));
     }
 
     @Override
     public ResponseEntity<SimpleResponseBody> refresh(HttpServletRequest request) {
-        ////////////////////////////////////////////////
-        String accessToken = "";
-        String refreshToken = "";
-        ////////////////////////////////////////////////
-        ////////////////////////////////////////////////
+        Cookie[] cookies = request.getCookies();
 
+        if (cookies == null) {
+            throw new CookieNotPresentException("");
+        }
+
+        String cookieRefreshToken = Arrays.stream(cookies)
+            .filter(cookie -> cookie.getName().equals(refreshTokenCookieName))
+            .findFirst().orElseThrow(() -> new CookieNotPresentException(refreshTokenCookieName))
+            .getValue();
+
+        if (!tokenService.isTokenValid(cookieRefreshToken)) {
+            throw new InvalidTokenException(cookieRefreshToken);
+        }
+
+        String tokenUsername = tokenService.extractSubject(cookieRefreshToken);
+        User user = userRepository.findByUsername(tokenUsername)
+            .orElseThrow(InvalidPasswordOrUsernameException::new);
+        UserDetails userDetails = new UserDetailsImpl(user);
+        String accessToken = tokenService.generateAccessToken(userDetails);
+        String refreshToken = tokenService.generateRefreshToken(userDetails);
+        RefreshToken refreshTokenEntity = refreshTokenRepository.findByUser(user)
+            .orElseThrow(() -> new InvalidTokenException(""));
+        refreshTokenEntity.setToken(refreshToken);
+        refreshTokenRepository.save(refreshTokenEntity);
 
         return ResponseEntity.ok()
             .header(
@@ -211,8 +245,9 @@ public class JwtAuthService implements AuthService {
             .build();
     }
 
-    private ResponseCookie generateCleaningCookie(String name) {
+    private ResponseCookie generateCleaningCookie(String name,String path) {
         return ResponseCookie.from(name)
+            .path(path)
             .maxAge(0)
             .build();
     }

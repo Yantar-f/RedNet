@@ -8,7 +8,7 @@ import java.util.function.Function;
 
 public interface TokenService {
 
-    String extractSubject(String token) throws ClaimNotPresentException;
+    String extractSubject(String token);
     Integer getAccessTokenExpirationMs();
     Integer getRefreshTokenExpirationMs();
     String generateAccessToken(UserDetails userDetails);
@@ -16,6 +16,6 @@ public interface TokenService {
     String generateRefreshToken(UserDetails userDetails);
     String generateRefreshToken(Map<String, Object> extraClaims, UserDetails userDetails);
     boolean isTokenValid(String token);
-    <T> T extractClaim(String token, Function<Claims, T> claimsResolver) throws ClaimNotPresentException;
+    <T> T extractClaim(String token, Function<Claims, T> claimsResolver);
     Claims extractAllClaims(String token);
 }

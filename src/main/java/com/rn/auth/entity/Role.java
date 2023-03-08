@@ -1,14 +1,20 @@
 package com.rn.auth.entity;
 
-import jakarta.persistence.*;
+
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
 
 @Entity
-@Table(name = "roles")
+@Table (name = "roles")
 public class Role {
 
     @Id
-    @Column(name = "designation")
-    @Enumerated(EnumType.STRING)
+    @Column (name = "designation")
+    @Enumerated (EnumType.STRING)
     private EnumRole designation;
 
 
