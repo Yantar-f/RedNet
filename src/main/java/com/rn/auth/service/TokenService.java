@@ -1,7 +1,6 @@
 package com.rn.auth.service;
 
 import io.jsonwebtoken.Claims;
-import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Map;
 import java.util.function.Function;

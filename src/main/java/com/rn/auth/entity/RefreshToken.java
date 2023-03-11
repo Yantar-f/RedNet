@@ -19,7 +19,7 @@ import jakarta.persistence.UniqueConstraint;
     name = "refresh_tokens",
     uniqueConstraints = {
         @UniqueConstraint (
-            name = "username_unique",
+            name = "user_id_unique",
             columnNames = "user_id")
     })
 public class RefreshToken {
@@ -32,11 +32,11 @@ public class RefreshToken {
     private String token;
 
     @OneToOne (
-        fetch = FetchType.EAGER,
+        fetch = FetchType.LAZY,
         cascade = CascadeType.MERGE)
     @JoinColumn (
         name = "user_id",
-        referencedColumnName = "username",
+        referencedColumnName = "id",
         nullable = false)
     private User user;
 
@@ -54,6 +54,9 @@ public class RefreshToken {
 
 
 
+    public Long getId(){
+        return id;
+    }
 
     public String getToken() {
         return token;
@@ -61,6 +64,10 @@ public class RefreshToken {
 
     public User getUser() {
         return user;
+    }
+
+    public void setId(Long id){
+        this.id = id;
     }
 
     public void setToken(String token) {

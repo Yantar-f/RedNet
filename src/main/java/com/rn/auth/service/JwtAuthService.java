@@ -10,7 +10,6 @@ import com.rn.auth.payload.SignInRequestBody;
 import com.rn.auth.payload.SignInResponseBody;
 import com.rn.auth.payload.SignUpRequestBody;
 import com.rn.auth.repository.RefreshTokenRepository;
-import com.rn.auth.repository.RoleRepository;
 import com.rn.auth.repository.UserRepository;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
@@ -21,7 +20,6 @@ import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -37,11 +35,9 @@ import java.util.concurrent.TimeUnit;
 public class JwtAuthService implements AuthService {
 
     private final UserRepository userRepository;
-    private final RoleRepository roleRepository;
     private final RefreshTokenRepository refreshTokenRepository;
     private final PasswordEncoder passwordEncoder;
     private final TokenService tokenService;
-    private final AuthenticationManager authenticationManager;
     private final String accessTokenCookieName;
     private final String refreshTokenCookieName;
     private final String accessTokenPath;
@@ -53,7 +49,6 @@ public class JwtAuthService implements AuthService {
     @Autowired
     private JwtAuthService(
         UserRepository userRepository,
-        RoleRepository roleRepository,
         RefreshTokenRepository refreshTokenRepository,
         PasswordEncoder passwordEncoder,
         TokenService tokenService,
@@ -64,11 +59,9 @@ public class JwtAuthService implements AuthService {
         @Value("${RedNet.app.refreshTokenPath}") String refreshTokenPath
     ) {
         this.userRepository = userRepository;
-        this.roleRepository = roleRepository;
         this.refreshTokenRepository = refreshTokenRepository;
         this.passwordEncoder = passwordEncoder;
         this.tokenService = tokenService;
-        this.authenticationManager = authenticationManager;
         this.accessTokenCookieName = accessTokenCookieName;
         this.refreshTokenCookieName = refreshTokenCookieName;
         this.accessTokenPath = accessTokenPath;
@@ -87,7 +80,8 @@ public class JwtAuthService implements AuthService {
         User user = new User(
             requestBody.getUsername(),
             requestBody.getEmail(),
-            passwordEncoder.encode(requestBody.getPassword()));
+            passwordEncoder.encode(requestBody.getPassword())
+        );
         Role role = new Role(EnumRole.USER);
         user.setRoles(Set.of(role));
 
@@ -97,8 +91,9 @@ public class JwtAuthService implements AuthService {
 
         SecurityContextHolder.getContext().setAuthentication(
             new UsernamePasswordAuthenticationToken(
-                userDetails.getUsername(),
-                userDetails.getPassword()
+                userDetails,
+                null,
+                userDetails.getAuthorities()
             )
         );
 
@@ -117,15 +112,26 @@ public class JwtAuthService implements AuthService {
                 HttpHeaders.SET_COOKIE,
                 generateRefreshCookie(refreshToken).toString()
             )
-            .body(new SignInResponseBody(requestBody.getUsername(),List.of(role.getDesignation().name())));
+            .body(
+                new SignInResponseBody(
+                    requestBody.getUsername(),
+                    List.of(role.getDesignation().name())
+                )
+            );
     }
 
     @Override
     public ResponseEntity<SignInResponseBody> signIn(SignInRequestBody requestBody) {
-        User user = userRepository.findByUsername(requestBody.getUsername()).orElseThrow();
+        User user = userRepository.findByUsername(requestBody.getUsername())
+            .orElseThrow(InvalidPasswordOrUsernameException::new);
+
+        if(!passwordEncoder.matches(requestBody.getPassword(),user.getPassword())){
+            throw new InvalidPasswordOrUsernameException();
+        }
+
         UserDetails userDetails = new UserDetailsImpl(user);
 
-        Authentication authentication = authenticationManager.authenticate(
+        SecurityContextHolder.getContext().setAuthentication(
             new UsernamePasswordAuthenticationToken(
                 userDetails,
                 null,
@@ -133,12 +139,12 @@ public class JwtAuthService implements AuthService {
             )
         );
 
-        SecurityContextHolder.getContext().setAuthentication(authentication);
-
-        String accessToken = tokenService.generateAccessToken(user.getUsername());
-        String refreshToken = refreshTokenRepository.findByUser_Username(user.getUsername())
-            .orElseGet(() -> {
-                RefreshToken refreshTokenEntity = new RefreshToken(tokenService.generateRefreshToken(user.getUsername()),user);
+        String accessToken = tokenService.generateAccessToken(userDetails.getUsername());
+        String refreshToken = refreshTokenRepository.findByUser_Id(user.getId()).orElseGet(() -> {
+                RefreshToken refreshTokenEntity = new RefreshToken(
+                    tokenService.generateRefreshToken(user.getUsername()),
+                    user
+                );
                 refreshTokenRepository.save(refreshTokenEntity);
                 return refreshTokenEntity;
             })
@@ -183,7 +189,7 @@ public class JwtAuthService implements AuthService {
         Cookie[] cookies = request.getCookies();
 
         if (cookies == null) {
-            throw new CookieNotPresentException("");
+            throw new CookieNotPresentException();
         }
 
         String cookieRefreshToken = Arrays.stream(cookies)
@@ -197,12 +203,13 @@ public class JwtAuthService implements AuthService {
 
         String tokenUsername = tokenService.extractSubject(cookieRefreshToken);
         User user = userRepository.findByUsername(tokenUsername)
-            .orElseThrow(InvalidPasswordOrUsernameException::new);
+            .orElseThrow(() -> new InvalidTokenException(cookieRefreshToken));
         String accessToken = tokenService.generateAccessToken(user.getUsername());
         String refreshToken = tokenService.generateRefreshToken(user.getUsername());
-        RefreshToken refreshTokenEntity = refreshTokenRepository.findByUser(user)
-            .orElseThrow(() -> new InvalidTokenException(""));
+        RefreshToken refreshTokenEntity = refreshTokenRepository.findByUser_Id(user.getId())
+            .orElseThrow(() -> new InvalidTokenException(cookieRefreshToken));
         refreshTokenEntity.setToken(refreshToken);
+
         refreshTokenRepository.save(refreshTokenEntity);
 
         return ResponseEntity.ok()

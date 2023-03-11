@@ -14,7 +14,6 @@ import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
@@ -71,35 +70,26 @@ public class AuthTokenFilter extends OncePerRequestFilter {
 
         final String accessToken = accessTokenCookie.getValue();
 
-        try {
-            if(tokenService.isTokenValid(accessToken)) {
-                SecurityContext securityContext = SecurityContextHolder.getContext();
+        if(tokenService.isTokenValid(accessToken)) {
+            SecurityContext securityContext = SecurityContextHolder.getContext();
+            if (securityContext.getAuthentication() == null) {
+                final String username = tokenService.extractSubject(accessToken);
+                UserDetails userDetails = userDetailsService.loadUserByUsername(username);
 
-                if (securityContext.getAuthentication() == null) {
-                    final String username = tokenService.extractSubject(accessToken);
-                    System.out.println("\n\n{{{filter}}}\nloadUserByUsername\n");
-                    UserDetails userDetails = userDetailsService.loadUserByUsername(username);
-                    System.out.println("{{{filter}}}\n\n");
-                    UsernamePasswordAuthenticationToken contextAuthToken =
-                        new UsernamePasswordAuthenticationToken(
-                            userDetails,
-                            null,
-                            userDetails.getAuthorities()
-                        );
-
-                    contextAuthToken.setDetails(
-                        new WebAuthenticationDetailsSource().buildDetails(request)
+                UsernamePasswordAuthenticationToken contextAuthToken =
+                    new UsernamePasswordAuthenticationToken(
+                        userDetails,
+                        null,
+                        userDetails.getAuthorities()
                     );
 
-                    securityContext.setAuthentication(contextAuthToken);
-                }
+                contextAuthToken.setDetails(
+                    new WebAuthenticationDetailsSource().buildDetails(request)
+                );
+                securityContext.setAuthentication(contextAuthToken);
             }
-
-            filterChain.doFilter(request,response);
-        } catch (
-            UsernameNotFoundException e
-        ) {
-            filterChain.doFilter(request,response);
         }
+
+        filterChain.doFilter(request,response);
     }
 }

@@ -54,7 +54,7 @@ public class AuthControllerExceptionHandler {
     }
 
     @ExceptionHandler(value = InvalidPasswordOrUsernameException.class)
-    public ResponseEntity<ErrorResponseBody> handleInvalidPasswordException(
+    public ResponseEntity<ErrorResponseBody> handleInvalidPasswordOrUsernameException(
         InvalidPasswordOrUsernameException ex,
         HttpServletRequest request
     ) {

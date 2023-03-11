@@ -1,10 +1,11 @@
 package com.rn.auth.entity;
 
-
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.JoinTable;
@@ -26,7 +27,13 @@ import java.util.Set;
 public class User /*extends StatisticableEntity*/ {
 
     @Id
-    @Column (name = "username")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id")
+    private Long id;
+
+    @Column (
+        name = "username",
+        length = 60)
     private String username;
 
     @Column(
@@ -67,7 +74,9 @@ public class User /*extends StatisticableEntity*/ {
     }
 
 
-
+    public Long getId(){
+        return id;
+    }
 
     public String getUsername() {
         return username;
@@ -83,6 +92,10 @@ public class User /*extends StatisticableEntity*/ {
 
     public Set<Role> getRoles(){
         return  roles;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
     }
 
     public void setUsername(String username) {
