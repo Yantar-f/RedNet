@@ -52,7 +52,7 @@ public class User /*extends StatisticableEntity*/ {
 
 
 
-    protected User() {}
+    public User() {}
     public User (String username) {
         this.username = username;
     }

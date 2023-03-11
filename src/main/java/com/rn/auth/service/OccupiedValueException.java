@@ -1,6 +1,6 @@
 package com.rn.auth.service;
 
-public abstract class OccupiedValueException extends RuntimeException {
+public class OccupiedValueException extends RuntimeException {
     public OccupiedValueException(String message) {
         super(message);
     }

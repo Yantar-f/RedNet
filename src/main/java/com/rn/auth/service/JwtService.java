@@ -12,7 +12,6 @@ import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import io.jsonwebtoken.security.SecurityException;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 import java.security.Key;
@@ -47,32 +46,32 @@ public class JwtService implements TokenService {
 
 
     @Override
-    public String generateAccessToken(UserDetails userDetails) {
-        return generateAccessToken(new HashMap<>(),userDetails);
+    public String generateAccessToken(String username) {
+        return generateAccessToken(new HashMap<>(),username);
     }
 
     @Override
     public String generateAccessToken(
         Map<String, Object> extraClaims,
-        UserDetails userDetails
+        String username
     ) {
         return getInitialBuilder()
             .setClaims(extraClaims)
-            .setSubject(userDetails.getUsername())
+            .setSubject(username)
             .setExpiration(new Date(System.currentTimeMillis() + getAccessTokenExpirationMs()))
             .compact();
     }
 
     @Override
-    public String generateRefreshToken(UserDetails userDetails) {
-        return generateRefreshToken(new HashMap<>(),userDetails);
+    public String generateRefreshToken(String username) {
+        return generateRefreshToken(new HashMap<>(),username);
     }
 
     @Override
-    public String generateRefreshToken(Map<String, Object> extraClaims, UserDetails userDetails) {
+    public String generateRefreshToken(Map<String, Object> extraClaims, String username) {
         return getInitialBuilder()
                 .setClaims(extraClaims)
-                .setSubject(userDetails.getUsername())
+                .setSubject(username)
                 .setExpiration(new Date(System.currentTimeMillis() + getRefreshTokenExpirationMs()))
                 .compact();
     }

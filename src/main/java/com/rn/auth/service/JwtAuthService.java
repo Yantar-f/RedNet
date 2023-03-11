@@ -80,37 +80,30 @@ public class JwtAuthService implements AuthService {
 
     @Override
     public ResponseEntity<SignInResponseBody> signUp(SignUpRequestBody requestBody) {
-        if (userRepository.existsByUsername(requestBody.getUsername())) {
-            throw new OccupiedUsernameException(requestBody.getUsername());
-        } else if(userRepository.existsByEmail(requestBody.getEmail())) {
-            throw new OccupiedEmailException(requestBody.getEmail());
+        if (userRepository.existsByUsernameOrEmail(requestBody.getUsername(),requestBody.getEmail())) {
+            throw new OccupiedValueException("Username or Email is occupied");
         }
 
         User user = new User(
             requestBody.getUsername(),
             requestBody.getEmail(),
             passwordEncoder.encode(requestBody.getPassword()));
-        Role role = roleRepository
-            .findByDesignation(EnumRole.USER)
-            .orElseThrow();
-
+        Role role = new Role(EnumRole.USER);
         user.setRoles(Set.of(role));
 
         userRepository.save(user);
+
         UserDetails userDetails = new UserDetailsImpl(user);
 
-        Authentication authentication = authenticationManager.authenticate(
+        SecurityContextHolder.getContext().setAuthentication(
             new UsernamePasswordAuthenticationToken(
-                userDetails,
-                requestBody.getPassword(),
-                userDetails.getAuthorities()
+                userDetails.getUsername(),
+                userDetails.getPassword()
             )
         );
 
-        SecurityContextHolder.getContext().setAuthentication(authentication);
-
-        String accessToken = tokenService.generateAccessToken(userDetails);
-        String refreshToken = tokenService.generateRefreshToken(userDetails);
+        String accessToken = tokenService.generateAccessToken(user.getUsername());
+        String refreshToken = tokenService.generateRefreshToken(user.getUsername());
         RefreshToken refreshTokenEntity = new RefreshToken(refreshToken,user);
 
         refreshTokenRepository.save(refreshTokenEntity);
@@ -129,24 +122,23 @@ public class JwtAuthService implements AuthService {
 
     @Override
     public ResponseEntity<SignInResponseBody> signIn(SignInRequestBody requestBody) {
-        User user = userRepository.findByUsername(requestBody.getUsername())
-            .orElseThrow(InvalidPasswordOrUsernameException::new);
-
+        User user = userRepository.findByUsername(requestBody.getUsername()).orElseThrow();
         UserDetails userDetails = new UserDetailsImpl(user);
+
         Authentication authentication = authenticationManager.authenticate(
             new UsernamePasswordAuthenticationToken(
                 userDetails,
-                requestBody.getPassword(),
+                null,
                 userDetails.getAuthorities()
             )
         );
 
         SecurityContextHolder.getContext().setAuthentication(authentication);
 
-        String accessToken = tokenService.generateAccessToken(userDetails);
-        String refreshToken = refreshTokenRepository.findByUser(user)
+        String accessToken = tokenService.generateAccessToken(user.getUsername());
+        String refreshToken = refreshTokenRepository.findByUser_Username(user.getUsername())
             .orElseGet(() -> {
-                RefreshToken refreshTokenEntity = new RefreshToken(tokenService.generateRefreshToken(userDetails),user);
+                RefreshToken refreshTokenEntity = new RefreshToken(tokenService.generateRefreshToken(user.getUsername()),user);
                 refreshTokenRepository.save(refreshTokenEntity);
                 return refreshTokenEntity;
             })
@@ -206,9 +198,8 @@ public class JwtAuthService implements AuthService {
         String tokenUsername = tokenService.extractSubject(cookieRefreshToken);
         User user = userRepository.findByUsername(tokenUsername)
             .orElseThrow(InvalidPasswordOrUsernameException::new);
-        UserDetails userDetails = new UserDetailsImpl(user);
-        String accessToken = tokenService.generateAccessToken(userDetails);
-        String refreshToken = tokenService.generateRefreshToken(userDetails);
+        String accessToken = tokenService.generateAccessToken(user.getUsername());
+        String refreshToken = tokenService.generateRefreshToken(user.getUsername());
         RefreshToken refreshTokenEntity = refreshTokenRepository.findByUser(user)
             .orElseThrow(() -> new InvalidTokenException(""));
         refreshTokenEntity.setToken(refreshToken);
