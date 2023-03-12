@@ -1,6 +1,5 @@
 package com.rn.auth.service;
 
-import com.rn.auth.model.UserDetailsImpl;
 import com.rn.auth.entity.EnumRole;
 import com.rn.auth.entity.RefreshToken;
 import com.rn.auth.entity.Role;
@@ -21,7 +20,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -87,7 +85,7 @@ public class JwtAuthService implements AuthService {
 
         SecurityContextHolder.getContext().setAuthentication(
             new UsernamePasswordAuthenticationToken(
-                user.getUsername(),
+                user.getId(),
                 null,
                 user.getRoles().stream()
                     .map(r -> new SimpleGrantedAuthority(r.getDesignation().name()))
@@ -129,7 +127,7 @@ public class JwtAuthService implements AuthService {
 
         SecurityContextHolder.getContext().setAuthentication(
             new UsernamePasswordAuthenticationToken(
-                user.getUsername(),
+                user.getId(),
                 null,
                 user.getRoles().stream()
                     .map(r -> new SimpleGrantedAuthority(r.getDesignation().name()))
@@ -199,8 +197,8 @@ public class JwtAuthService implements AuthService {
             throw new InvalidTokenException(cookieRefreshToken);
         }
 
-        String tokenUsername = tokenService.extractSubject(cookieRefreshToken);
-        User user = userRepository.findByUsername(tokenUsername)
+        Long userId = Long.valueOf(tokenService.extractSubject(cookieRefreshToken));
+        User user = userRepository.findById(userId)
             .orElseThrow(() -> new InvalidTokenException(cookieRefreshToken));
         String accessToken = tokenService.generateAccessToken(user);
         String refreshToken = tokenService.generateRefreshToken(user);

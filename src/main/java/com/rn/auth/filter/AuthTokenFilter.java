@@ -71,14 +71,14 @@ public class AuthTokenFilter extends OncePerRequestFilter {
         if(tokenService.isTokenValid(accessToken)) {
             SecurityContext securityContext = SecurityContextHolder.getContext();
             if (securityContext.getAuthentication() == null) {
-                final String username = tokenService.extractSubject(accessToken);
+                final Long id = Long.valueOf(tokenService.extractSubject(accessToken));
                 final List<SimpleGrantedAuthority> authorities = tokenService.extractRoles(accessToken).stream()
                     .map(SimpleGrantedAuthority::new)
                     .toList();
 
                 UsernamePasswordAuthenticationToken contextAuthToken =
                     new UsernamePasswordAuthenticationToken(
-                        username,
+                        id,
                         null,
                         authorities
                     );

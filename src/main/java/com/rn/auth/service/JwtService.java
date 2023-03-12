@@ -1,9 +1,5 @@
 package com.rn.auth.service;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.JsonMappingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.rn.auth.entity.User;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
@@ -20,7 +16,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.security.Key;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -69,7 +64,7 @@ public class JwtService implements TokenService {
     ) {
         return getInitialBuilder()
             .setClaims(extraClaims)
-            .setSubject(user.getUsername())
+            .setSubject(user.getId().toString())
             .setExpiration(new Date(System.currentTimeMillis() + getAccessTokenExpirationMs()))
             .compact();
     }
@@ -83,7 +78,7 @@ public class JwtService implements TokenService {
     public String generateRefreshToken(Map<String, Object> extraClaims, User user) {
         return getInitialBuilder()
                 .setClaims(extraClaims)
-                .setSubject(user.getUsername())
+                .setSubject(user.getId().toString())
                 .setExpiration(new Date(System.currentTimeMillis() + getRefreshTokenExpirationMs()))
                 .compact();
     }
