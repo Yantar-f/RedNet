@@ -1,6 +1,5 @@
 package com.rn.auth.service;
 
-import com.rn.auth.entity.Role;
 import com.rn.auth.entity.User;
 import io.jsonwebtoken.Claims;
 

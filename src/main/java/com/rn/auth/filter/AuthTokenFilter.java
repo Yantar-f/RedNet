@@ -34,7 +34,6 @@ public class AuthTokenFilter extends OncePerRequestFilter {
     @Autowired
     public AuthTokenFilter(
         TokenService tokenService,
-        UserDetailsService userDetailsService,
         @Value("${RedNet.app.accessTokenCookieName}") String accessTokenCookieName
     ) {
         this.tokenService = tokenService;
