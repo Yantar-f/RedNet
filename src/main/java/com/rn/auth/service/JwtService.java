@@ -1,5 +1,10 @@
 package com.rn.auth.service;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.rn.auth.entity.User;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.JwtBuilder;
@@ -15,8 +20,10 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.security.Key;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.Function;
@@ -46,32 +53,37 @@ public class JwtService implements TokenService {
 
 
     @Override
-    public String generateAccessToken(String username) {
-        return generateAccessToken(new HashMap<>(),username);
+    public String generateAccessToken(User user) {
+        HashMap<String,Object> rolesClaims = new HashMap<>();
+        rolesClaims.put(
+            "roles",
+            user.getRoles().stream().map(role -> role.getDesignation().name()).toList()
+        );
+        return generateAccessToken(rolesClaims,user);
     }
 
     @Override
     public String generateAccessToken(
         Map<String, Object> extraClaims,
-        String username
+        User user
     ) {
         return getInitialBuilder()
             .setClaims(extraClaims)
-            .setSubject(username)
+            .setSubject(user.getUsername())
             .setExpiration(new Date(System.currentTimeMillis() + getAccessTokenExpirationMs()))
             .compact();
     }
 
     @Override
-    public String generateRefreshToken(String username) {
-        return generateRefreshToken(new HashMap<>(),username);
+    public String generateRefreshToken(User user) {
+        return generateRefreshToken(new HashMap<>(),user);
     }
 
     @Override
-    public String generateRefreshToken(Map<String, Object> extraClaims, String username) {
+    public String generateRefreshToken(Map<String, Object> extraClaims, User user) {
         return getInitialBuilder()
                 .setClaims(extraClaims)
-                .setSubject(username)
+                .setSubject(user.getUsername())
                 .setExpiration(new Date(System.currentTimeMillis() + getRefreshTokenExpirationMs()))
                 .compact();
     }
@@ -79,6 +91,16 @@ public class JwtService implements TokenService {
     @Override
     public String extractSubject(String token) throws ClaimNotPresentException {
         return extractClaim(token, Claims::getSubject);
+    }
+
+    @Override
+    public List<String> extractRoles(String token) {
+        try {
+            return (List<String>) extractClaim(token, claims -> claims.get("roles"));
+        } catch (ClassCastException ex) {
+            throw new ClaimNotPresentException();
+        }
+
     }
 
     @Override

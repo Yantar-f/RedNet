@@ -18,9 +18,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -52,7 +51,6 @@ public class JwtAuthService implements AuthService {
         RefreshTokenRepository refreshTokenRepository,
         PasswordEncoder passwordEncoder,
         TokenService tokenService,
-        AuthenticationManager authenticationManager,
         @Value("${RedNet.app.accessTokenCookieName}") String accessTokenCookieName,
         @Value("${RedNet.app.refreshTokenCookieName}") String refreshTokenCookieName,
         @Value("${RedNet.app.accessTokenPath}") String accessTokenPath,
@@ -87,18 +85,18 @@ public class JwtAuthService implements AuthService {
 
         userRepository.save(user);
 
-        UserDetails userDetails = new UserDetailsImpl(user);
-
         SecurityContextHolder.getContext().setAuthentication(
             new UsernamePasswordAuthenticationToken(
-                userDetails,
+                user.getUsername(),
                 null,
-                userDetails.getAuthorities()
+                user.getRoles().stream()
+                    .map(r -> new SimpleGrantedAuthority(r.getDesignation().name()))
+                    .toList()
             )
         );
 
-        String accessToken = tokenService.generateAccessToken(user.getUsername());
-        String refreshToken = tokenService.generateRefreshToken(user.getUsername());
+        String accessToken = tokenService.generateAccessToken(user);
+        String refreshToken = tokenService.generateRefreshToken(user);
         RefreshToken refreshTokenEntity = new RefreshToken(refreshToken,user);
 
         refreshTokenRepository.save(refreshTokenEntity);
@@ -129,20 +127,20 @@ public class JwtAuthService implements AuthService {
             throw new InvalidPasswordOrUsernameException();
         }
 
-        UserDetails userDetails = new UserDetailsImpl(user);
-
         SecurityContextHolder.getContext().setAuthentication(
             new UsernamePasswordAuthenticationToken(
-                userDetails,
+                user.getUsername(),
                 null,
-                userDetails.getAuthorities()
+                user.getRoles().stream()
+                    .map(r -> new SimpleGrantedAuthority(r.getDesignation().name()))
+                    .toList()
             )
         );
 
-        String accessToken = tokenService.generateAccessToken(userDetails.getUsername());
+        String accessToken = tokenService.generateAccessToken(user);
         String refreshToken = refreshTokenRepository.findByUser_Id(user.getId()).orElseGet(() -> {
                 RefreshToken refreshTokenEntity = new RefreshToken(
-                    tokenService.generateRefreshToken(user.getUsername()),
+                    tokenService.generateRefreshToken(user),
                     user
                 );
                 refreshTokenRepository.save(refreshTokenEntity);
@@ -161,9 +159,9 @@ public class JwtAuthService implements AuthService {
             )
             .body(
                 new SignInResponseBody(
-                    userDetails.getUsername(),
-                    userDetails.getAuthorities().stream()
-                        .map(GrantedAuthority::getAuthority)
+                    user.getUsername(),
+                    user.getRoles().stream()
+                        .map(role -> role.getDesignation().name())
                         .toList()
                 )
             );
@@ -204,8 +202,8 @@ public class JwtAuthService implements AuthService {
         String tokenUsername = tokenService.extractSubject(cookieRefreshToken);
         User user = userRepository.findByUsername(tokenUsername)
             .orElseThrow(() -> new InvalidTokenException(cookieRefreshToken));
-        String accessToken = tokenService.generateAccessToken(user.getUsername());
-        String refreshToken = tokenService.generateRefreshToken(user.getUsername());
+        String accessToken = tokenService.generateAccessToken(user);
+        String refreshToken = tokenService.generateRefreshToken(user);
         RefreshToken refreshTokenEntity = refreshTokenRepository.findByUser_Id(user.getId())
             .orElseThrow(() -> new InvalidTokenException(cookieRefreshToken));
         refreshTokenEntity.setToken(refreshToken);
