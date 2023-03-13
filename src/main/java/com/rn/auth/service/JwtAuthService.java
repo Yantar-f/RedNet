@@ -83,15 +83,7 @@ public class JwtAuthService implements AuthService {
 
         userRepository.save(user);
 
-        SecurityContextHolder.getContext().setAuthentication(
-            new UsernamePasswordAuthenticationToken(
-                user.getId(),
-                null,
-                user.getRoles().stream()
-                    .map(r -> new SimpleGrantedAuthority(r.getDesignation().name()))
-                    .toList()
-            )
-        );
+        setAuthentication(user);
 
         String accessToken = tokenService.generateAccessToken(user);
         String refreshToken = tokenService.generateRefreshToken(user);
@@ -125,15 +117,7 @@ public class JwtAuthService implements AuthService {
             throw new InvalidPasswordOrUsernameException();
         }
 
-        SecurityContextHolder.getContext().setAuthentication(
-            new UsernamePasswordAuthenticationToken(
-                user.getId(),
-                null,
-                user.getRoles().stream()
-                    .map(r -> new SimpleGrantedAuthority(r.getDesignation().name()))
-                    .toList()
-            )
-        );
+        setAuthentication(user);
 
         String accessToken = tokenService.generateAccessToken(user);
         String refreshToken = refreshTokenRepository.findByUser_Id(user.getId()).orElseGet(() -> {
@@ -222,6 +206,17 @@ public class JwtAuthService implements AuthService {
 
 
 
+    private void setAuthentication(User user){
+        SecurityContextHolder.getContext().setAuthentication(
+            new UsernamePasswordAuthenticationToken(
+                user.getId(),
+                null,
+                user.getRoles().stream()
+                    .map(r -> new SimpleGrantedAuthority(r.getDesignation().name()))
+                    .toList()
+            )
+        );
+    }
 
     private ResponseCookie generateAccessCookie(String value) {
         return ResponseCookie.from(accessTokenCookieName, value)
