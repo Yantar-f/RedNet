@@ -12,6 +12,7 @@ import com.rn.auth.repository.RefreshTokenRepository;
 import com.rn.auth.repository.UserRepository;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
@@ -120,15 +121,21 @@ public class JwtAuthService implements AuthService {
         setAuthentication(user);
 
         String accessToken = tokenService.generateAccessToken(user);
-        String refreshToken = refreshTokenRepository.findByUser_Id(user.getId()).orElseGet(() -> {
-                RefreshToken refreshTokenEntity = new RefreshToken(
+        RefreshToken refreshTokenEntity = refreshTokenRepository.findByUser_Id(user.getId()).orElseGet(() -> {
+                RefreshToken refreshTokenEntityTmp = new RefreshToken(
                     tokenService.generateRefreshToken(user),
                     user
                 );
-                refreshTokenRepository.save(refreshTokenEntity);
-                return refreshTokenEntity;
-            })
-            .getToken();
+                refreshTokenRepository.save(refreshTokenEntityTmp);
+                return refreshTokenEntityTmp;
+            });
+
+        if(!tokenService.isTokenValid(refreshTokenEntity.getToken())){
+            refreshTokenEntity.setToken(tokenService.generateRefreshToken(user));
+            refreshTokenRepository.updateToken(refreshTokenEntity.getId(),refreshTokenEntity.getToken());
+        }
+
+        String refreshToken = refreshTokenEntity.getToken();
 
         return ResponseEntity.ok()
             .header(
@@ -188,9 +195,8 @@ public class JwtAuthService implements AuthService {
         String refreshToken = tokenService.generateRefreshToken(user);
         RefreshToken refreshTokenEntity = refreshTokenRepository.findByUser_Id(user.getId())
             .orElseThrow(() -> new InvalidTokenException(cookieRefreshToken));
-        refreshTokenEntity.setToken(refreshToken);
 
-        refreshTokenRepository.save(refreshTokenEntity);
+        refreshTokenRepository.updateToken(refreshTokenEntity.getId(),refreshToken);
 
         return ResponseEntity.ok()
             .header(
