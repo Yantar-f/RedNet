@@ -85,6 +85,7 @@ public class AuthTokenFilter extends OncePerRequestFilter {
                 contextAuthToken.setDetails(
                     new WebAuthenticationDetailsSource().buildDetails(request)
                 );
+
                 securityContext.setAuthentication(contextAuthToken);
             }
         }

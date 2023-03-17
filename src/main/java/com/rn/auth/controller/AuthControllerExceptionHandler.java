@@ -85,6 +85,9 @@ public class AuthControllerExceptionHandler {
         return getDefaultBadRequest(ex,request);
     }
 
+
+
+
     private ResponseEntity<ErrorResponseBody> getDefaultBadRequest(
         Exception ex,
         HttpServletRequest request

@@ -1,7 +1,6 @@
 package com.rn.auth.entity;
 
 
-import jakarta.annotation.Generated;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -10,17 +9,29 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
+import jakarta.persistence.NamedAttributeNode;
+import jakarta.persistence.NamedEntityGraph;
+import jakarta.persistence.NamedSubgraph;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
 
 @Entity
-@Table (
+@Table(
     name = "refresh_tokens",
     uniqueConstraints = {
         @UniqueConstraint (
             name = "user_id_unique",
             columnNames = "user_id")
+    })
+@NamedEntityGraph(
+    name = "eager-refresh-token",
+    attributeNodes = @NamedAttributeNode(value = "user", subgraph = "eager-user"),
+    subgraphs = {
+        @NamedSubgraph(
+            name = "eager-user",
+            attributeNodes = @NamedAttributeNode(value = "roles")
+        )
     })
 public class RefreshToken {
 
@@ -51,6 +62,7 @@ public class RefreshToken {
         this.token = token;
         this.user = user;
     }
+
 
 
 

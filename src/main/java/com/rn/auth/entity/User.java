@@ -17,7 +17,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 @Entity
-@Table (
+@Table(
     name = "users",
     uniqueConstraints = {
         @UniqueConstraint (
@@ -72,6 +72,8 @@ public class User /*extends StatisticableEntity*/ {
         this.email = email;
         this.password = password;
     }
+
+
 
 
     public Long getId(){

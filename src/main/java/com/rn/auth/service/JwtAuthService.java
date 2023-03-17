@@ -12,7 +12,6 @@ import com.rn.auth.repository.RefreshTokenRepository;
 import com.rn.auth.repository.UserRepository;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
-import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
@@ -111,7 +110,7 @@ public class JwtAuthService implements AuthService {
 
     @Override
     public ResponseEntity<SignInResponseBody> signIn(SignInRequestBody requestBody) {
-        User user = userRepository.findByUsername(requestBody.getUsername())
+        User user = userRepository.findEagerByUsername(requestBody.getUsername())
             .orElseThrow(InvalidPasswordOrUsernameException::new);
 
         if(!passwordEncoder.matches(requestBody.getPassword(),user.getPassword())){
@@ -189,12 +188,10 @@ public class JwtAuthService implements AuthService {
         }
 
         Long userId = Long.valueOf(tokenService.extractSubject(cookieRefreshToken));
-        User user = userRepository.findById(userId)
+        RefreshToken refreshTokenEntity = refreshTokenRepository.findEagerByUser_Id(userId)
             .orElseThrow(() -> new InvalidTokenException(cookieRefreshToken));
-        String accessToken = tokenService.generateAccessToken(user);
-        String refreshToken = tokenService.generateRefreshToken(user);
-        RefreshToken refreshTokenEntity = refreshTokenRepository.findByUser_Id(user.getId())
-            .orElseThrow(() -> new InvalidTokenException(cookieRefreshToken));
+        String accessToken = tokenService.generateAccessToken(refreshTokenEntity.getUser());
+        String refreshToken = tokenService.generateRefreshToken(refreshTokenEntity.getUser());
 
         refreshTokenRepository.updateToken(refreshTokenEntity.getId(),refreshToken);
 
