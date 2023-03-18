@@ -8,8 +8,10 @@ import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.ResponseEntity;
 
 public interface AuthService {
-    ResponseEntity<SignInResponseBody> signUp(SignUpRequestBody request);
+    ResponseEntity<Object> signUp(SignUpRequestBody request);
     ResponseEntity<SignInResponseBody> signIn(SignInRequestBody request);
     ResponseEntity<SimpleResponseBody> signOut(HttpServletRequest request);
     ResponseEntity<SimpleResponseBody> refresh(HttpServletRequest request);
+
+    ResponseEntity<SignInResponseBody> verify(String token);
 }

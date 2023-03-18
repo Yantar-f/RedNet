@@ -8,9 +8,4 @@ public class CookieNotPresentException extends RuntimeException {
     public CookieNotPresentException() {
         super("Cookie is not present");
     }
-    @Override
-    public String getMessage(){
-        return super.getMessage();
-    }
-
 }

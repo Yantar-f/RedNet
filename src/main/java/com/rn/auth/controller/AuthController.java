@@ -1,6 +1,7 @@
 package com.rn.auth.controller;
 
 import com.rn.auth.payload.SignInRequestBody;
+import com.rn.auth.payload.SignInResponseBody;
 import com.rn.auth.payload.SignUpRequestBody;
 
 import com.rn.auth.service.AuthService;
@@ -8,9 +9,11 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 
@@ -49,5 +52,10 @@ public class AuthController {
     @PostMapping("/refresh")
     public ResponseEntity<?> refresh(HttpServletRequest request) {
         return authService.refresh(request);
+    }
+
+    @GetMapping("/verify")
+    public ResponseEntity<SignInResponseBody> verify(@RequestParam(name = "token") String token) {
+        return authService.verify(token);
     }
 }

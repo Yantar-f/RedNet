@@ -1,6 +1,6 @@
 package com.rn.auth.filter;
 
-import com.rn.auth.service.TokenService;
+import com.rn.auth.service.AuthTokenService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.Cookie;
@@ -24,7 +24,7 @@ import java.util.List;
 @Component
 public class AuthTokenFilter extends OncePerRequestFilter {
 
-    private final TokenService tokenService;
+    private final AuthTokenService authTokenService;
     private final String accessTokenCookieName;
 
 
@@ -32,10 +32,10 @@ public class AuthTokenFilter extends OncePerRequestFilter {
 
     @Autowired
     public AuthTokenFilter(
-        TokenService tokenService,
+        AuthTokenService authTokenService,
         @Value("${RedNet.app.accessTokenCookieName}") String accessTokenCookieName
     ) {
-        this.tokenService = tokenService;
+        this.authTokenService = authTokenService;
         this.accessTokenCookieName = accessTokenCookieName;
     }
 
@@ -67,11 +67,11 @@ public class AuthTokenFilter extends OncePerRequestFilter {
 
         final String accessToken = accessTokenCookie.getValue();
 
-        if(tokenService.isTokenValid(accessToken)) {
+        if(authTokenService.isTokenValid(accessToken)) {
             SecurityContext securityContext = SecurityContextHolder.getContext();
             if (securityContext.getAuthentication() == null) {
-                final Long id = Long.valueOf(tokenService.extractSubject(accessToken));
-                final List<SimpleGrantedAuthority> authorities = tokenService.extractRoles(accessToken).stream()
+                final Long id = Long.valueOf(authTokenService.extractSubject(accessToken));
+                final List<SimpleGrantedAuthority> authorities = authTokenService.extractRoles(accessToken).stream()
                     .map(SimpleGrantedAuthority::new)
                     .toList();
 

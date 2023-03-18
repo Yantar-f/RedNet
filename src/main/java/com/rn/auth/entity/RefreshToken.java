@@ -16,6 +16,8 @@ import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
 
+import java.util.Date;
+
 @Entity
 @Table(
     name = "refresh_tokens",
@@ -30,8 +32,7 @@ import jakarta.persistence.UniqueConstraint;
     subgraphs = {
         @NamedSubgraph(
             name = "eager-user",
-            attributeNodes = @NamedAttributeNode(value = "roles")
-        )
+            attributeNodes = @NamedAttributeNode(value = "roles"))
     })
 public class RefreshToken {
 
@@ -41,6 +42,9 @@ public class RefreshToken {
 
     @Column (name = "token")
     private String token;
+
+    @Column(name = "exp_date")
+    private Date expDate;
 
     @OneToOne (
         fetch = FetchType.LAZY,
@@ -57,9 +61,11 @@ public class RefreshToken {
     protected RefreshToken() {}
     public RefreshToken(
         String token,
+        Date expDate,
         User user
     ) {
         this.token = token;
+        this.expDate = expDate;
         this.user = user;
     }
 
@@ -74,6 +80,10 @@ public class RefreshToken {
         return token;
     }
 
+    public Date getExpDate() {
+        return expDate;
+    }
+
     public User getUser() {
         return user;
     }
@@ -84,6 +94,10 @@ public class RefreshToken {
 
     public void setToken(String token) {
         this.token = token;
+    }
+
+    public void setExpDate(Date expDate) {
+        this.expDate = expDate;
     }
 
 }

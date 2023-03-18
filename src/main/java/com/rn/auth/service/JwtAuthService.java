@@ -15,6 +15,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -23,8 +24,9 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.net.URI;
 import java.util.Arrays;
-import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
@@ -34,11 +36,13 @@ public class JwtAuthService implements AuthService {
     private final UserRepository userRepository;
     private final RefreshTokenRepository refreshTokenRepository;
     private final PasswordEncoder passwordEncoder;
-    private final TokenService tokenService;
+    private final AuthTokenService authTokenService;
+    private final AuthEmailService authEmailService;
     private final String accessTokenCookieName;
     private final String refreshTokenCookieName;
     private final String accessTokenPath;
     private final String refreshTokenPath;
+    private final String emailVerifiedLink;
 
 
 
@@ -48,27 +52,31 @@ public class JwtAuthService implements AuthService {
         UserRepository userRepository,
         RefreshTokenRepository refreshTokenRepository,
         PasswordEncoder passwordEncoder,
-        TokenService tokenService,
+        AuthTokenService authTokenService,
+        AuthEmailService authEmailService,
         @Value("${RedNet.app.accessTokenCookieName}") String accessTokenCookieName,
         @Value("${RedNet.app.refreshTokenCookieName}") String refreshTokenCookieName,
         @Value("${RedNet.app.accessTokenPath}") String accessTokenPath,
-        @Value("${RedNet.app.refreshTokenPath}") String refreshTokenPath
+        @Value("${RedNet.app.refreshTokenPath}") String refreshTokenPath,
+        @Value("${RedNet.app.emailVerifiedLink}") String emailVerifiedLink
     ) {
         this.userRepository = userRepository;
         this.refreshTokenRepository = refreshTokenRepository;
         this.passwordEncoder = passwordEncoder;
-        this.tokenService = tokenService;
+        this.authTokenService = authTokenService;
+        this.authEmailService = authEmailService;
         this.accessTokenCookieName = accessTokenCookieName;
         this.refreshTokenCookieName = refreshTokenCookieName;
         this.accessTokenPath = accessTokenPath;
         this.refreshTokenPath = refreshTokenPath;
+        this.emailVerifiedLink = emailVerifiedLink;
     }
 
 
 
 
     @Override
-    public ResponseEntity<SignInResponseBody> signUp(SignUpRequestBody requestBody) {
+    public ResponseEntity<Object> signUp(SignUpRequestBody requestBody) {
         if (userRepository.existsByUsernameOrEmail(requestBody.getUsername(),requestBody.getEmail())) {
             throw new OccupiedValueException("Username or Email is occupied");
         }
@@ -76,65 +84,55 @@ public class JwtAuthService implements AuthService {
         User user = new User(
             requestBody.getUsername(),
             requestBody.getEmail(),
-            passwordEncoder.encode(requestBody.getPassword())
+            passwordEncoder.encode(requestBody.getPassword()),
+            Set.of(new Role(EnumRole.USER))
         );
-        Role role = new Role(EnumRole.USER);
-        user.setRoles(Set.of(role));
 
         userRepository.save(user);
 
         setAuthentication(user);
 
-        String accessToken = tokenService.generateAccessToken(user);
-        String refreshToken = tokenService.generateRefreshToken(user);
-        RefreshToken refreshTokenEntity = new RefreshToken(refreshToken,user);
+        authEmailService.sendEmail(user.getEmail(), authTokenService.generateEmailVerificationToken(user));
 
-        refreshTokenRepository.save(refreshTokenEntity);
-
-        return ResponseEntity.ok()
-            .header(
-                HttpHeaders.SET_COOKIE,
-                generateAccessCookie(accessToken).toString()
-            )
-            .header(
-                HttpHeaders.SET_COOKIE,
-                generateRefreshCookie(refreshToken).toString()
-            )
-            .body(
-                new SignInResponseBody(
-                    requestBody.getUsername(),
-                    List.of(role.getDesignation().name())
-                )
-            );
+        return ResponseEntity.ok().build();
     }
 
     @Override
     public ResponseEntity<SignInResponseBody> signIn(SignInRequestBody requestBody) {
-        User user = userRepository.findEagerByUsername(requestBody.getUsername())
+        User user = userRepository.findEagerByUsernameAndEnabled(requestBody.getUsername(), true)
             .orElseThrow(InvalidPasswordOrUsernameException::new);
 
-        if(!passwordEncoder.matches(requestBody.getPassword(),user.getPassword())){
+        if(!passwordEncoder.matches(requestBody.getPassword(),user.getPassword())) {
             throw new InvalidPasswordOrUsernameException();
         }
 
         setAuthentication(user);
 
-        String accessToken = tokenService.generateAccessToken(user);
-        RefreshToken refreshTokenEntity = refreshTokenRepository.findByUser_Id(user.getId()).orElseGet(() -> {
-                RefreshToken refreshTokenEntityTmp = new RefreshToken(
-                    tokenService.generateRefreshToken(user),
-                    user
+        String accessToken = authTokenService.generateAccessToken(user);
+        String refreshToken;
+        Optional<RefreshToken> optionalRefreshToken = refreshTokenRepository.findByUser_Id(user.getId());
+
+        if(optionalRefreshToken.isPresent()) {
+            if(!authTokenService.isTokenValid(optionalRefreshToken.get().getToken())){
+                refreshToken = authTokenService.generateRefreshToken(user);
+                refreshTokenRepository.updateToken(
+                    optionalRefreshToken.get().getId(),
+                    refreshToken,
+                    authTokenService.extractExpiration(refreshToken)
                 );
-                refreshTokenRepository.save(refreshTokenEntityTmp);
-                return refreshTokenEntityTmp;
-            });
-
-        if(!tokenService.isTokenValid(refreshTokenEntity.getToken())){
-            refreshTokenEntity.setToken(tokenService.generateRefreshToken(user));
-            refreshTokenRepository.updateToken(refreshTokenEntity.getId(),refreshTokenEntity.getToken());
+            } else {
+                refreshToken = optionalRefreshToken.get().getToken();
+            }
+        } else {
+            refreshToken = authTokenService.generateRefreshToken(user);
+            refreshTokenRepository.save(
+                new RefreshToken(
+                    refreshToken,
+                    authTokenService.extractExpiration(refreshToken),
+                    user
+                )
+            );
         }
-
-        String refreshToken = refreshTokenEntity.getToken();
 
         return ResponseEntity.ok()
             .header(
@@ -183,17 +181,21 @@ public class JwtAuthService implements AuthService {
             .findFirst().orElseThrow(() -> new CookieNotPresentException(refreshTokenCookieName))
             .getValue();
 
-        if (!tokenService.isTokenValid(cookieRefreshToken)) {
+        if (!authTokenService.isTokenValid(cookieRefreshToken)) {
             throw new InvalidTokenException(cookieRefreshToken);
         }
 
-        Long userId = Long.valueOf(tokenService.extractSubject(cookieRefreshToken));
+        Long userId = Long.valueOf(authTokenService.extractSubject(cookieRefreshToken));
         RefreshToken refreshTokenEntity = refreshTokenRepository.findEagerByUser_Id(userId)
             .orElseThrow(() -> new InvalidTokenException(cookieRefreshToken));
-        String accessToken = tokenService.generateAccessToken(refreshTokenEntity.getUser());
-        String refreshToken = tokenService.generateRefreshToken(refreshTokenEntity.getUser());
+        String accessToken = authTokenService.generateAccessToken(refreshTokenEntity.getUser());
+        String refreshToken = authTokenService.generateRefreshToken(refreshTokenEntity.getUser());
 
-        refreshTokenRepository.updateToken(refreshTokenEntity.getId(),refreshToken);
+        refreshTokenRepository.updateToken(
+            refreshTokenEntity.getId(),
+            refreshToken,
+            authTokenService.extractExpiration(refreshToken)
+        );
 
         return ResponseEntity.ok()
             .header(
@@ -206,6 +208,49 @@ public class JwtAuthService implements AuthService {
             )
             .body(new SimpleResponseBody("refresh success"));
     }
+
+    @Override
+    public ResponseEntity<SignInResponseBody> verify(String token) {
+        if(!authTokenService.isTokenValid(token)) {
+            throw new InvalidTokenException(token);
+        }
+
+        Long userId = Long.valueOf(authTokenService.extractSubject(token));
+        userRepository.enableUserById(userId);
+
+        User user = userRepository.findEagerById(userId)
+            .orElseThrow(InvalidPasswordOrUsernameException::new);
+        String accessToken = authTokenService.generateAccessToken(user);
+        String refreshToken = authTokenService.generateRefreshToken(user);
+
+        refreshTokenRepository.save(
+            new RefreshToken(
+                refreshToken,
+                authTokenService.extractExpiration(refreshToken),
+                user
+            )
+        );
+
+        return ResponseEntity.status(HttpStatus.FOUND).location(URI.create(emailVerifiedLink))
+            .header(
+                HttpHeaders.SET_COOKIE,
+                generateAccessCookie(accessToken).toString()
+            )
+            .header(
+                HttpHeaders.SET_COOKIE,
+                generateRefreshCookie(refreshToken).toString()
+            )
+            .body(
+                new SignInResponseBody(
+                    user.getUsername(),
+                    user.getRoles().stream()
+                        .map(role -> role.getDesignation().name())
+                        .toList()
+                )
+            );
+
+    }
+
 
 
 
@@ -225,7 +270,7 @@ public class JwtAuthService implements AuthService {
         return ResponseCookie.from(accessTokenCookieName, value)
             .path(accessTokenPath)
             .httpOnly(true)
-            .maxAge(TimeUnit.MILLISECONDS.toSeconds(tokenService.getAccessTokenExpirationMs()))
+            .maxAge(TimeUnit.MILLISECONDS.toSeconds(authTokenService.getAccessTokenExpirationMs()))
             .build();
     }
 
@@ -233,7 +278,7 @@ public class JwtAuthService implements AuthService {
         return ResponseCookie.from(refreshTokenCookieName, value)
             .path(refreshTokenPath)
             .httpOnly(true)
-            .maxAge(TimeUnit.MILLISECONDS.toSeconds(tokenService.getRefreshTokenExpirationMs()))
+            .maxAge(TimeUnit.MILLISECONDS.toSeconds(authTokenService.getRefreshTokenExpirationMs()))
             .build();
     }
 

@@ -24,24 +24,27 @@ import java.util.Optional;
 import java.util.function.Function;
 
 @Service
-public class JwtService implements TokenService {
+public class SimpleAuthTokenService implements AuthTokenService {
 
     private final String secretKey;
     private final Integer accessTokenExpirationMs;
     private final Integer refreshTokenExpirationMs;
+    private final Integer mailVerificationTokenExpirationMs;
     private final SignatureAlgorithm signatureAlgorithm = SignatureAlgorithm.HS256;
 
 
 
 
-    public JwtService(
+    public SimpleAuthTokenService(
         @Value("${RedNet.app.jwt.secretKey}") String secretKey,
         @Value("${RedNet.app.accessTokenExpirationMs}") Integer accessTokenExpirationMs,
-        @Value("${RedNet.app.refreshTokenExpirationMs}") Integer refreshTokenExpirationMs
+        @Value("${RedNet.app.refreshTokenExpirationMs}") Integer refreshTokenExpirationMs,
+        @Value("${RedNet.app.mailVerificationTokenExpirationMs}") Integer mailVerificationTokenExpirationMs
     ) {
         this.secretKey = secretKey;
         this.accessTokenExpirationMs = accessTokenExpirationMs;
         this.refreshTokenExpirationMs = refreshTokenExpirationMs;
+        this.mailVerificationTokenExpirationMs = mailVerificationTokenExpirationMs;
     }
 
 
@@ -84,6 +87,20 @@ public class JwtService implements TokenService {
     }
 
     @Override
+    public String generateEmailVerificationToken(User user) {
+        return generateEmailVerificationToken(new HashMap<>(),user);
+    }
+
+    @Override
+    public String generateEmailVerificationToken(Map<String, Object> extraClaims, User user) {
+        return getInitialBuilder()
+            .setClaims(extraClaims)
+            .setSubject(user.getId().toString())
+            .setExpiration(new Date(System.currentTimeMillis() + getMailVerificationTokenExpirationMs()))
+            .compact();
+    }
+
+    @Override
     public String extractSubject(String token) throws ClaimNotPresentException {
         return extractClaim(token, Claims::getSubject);
     }
@@ -96,6 +113,13 @@ public class JwtService implements TokenService {
             throw new ClaimNotPresentException();
         }
 
+    }
+
+
+
+
+    public Date extractExpiration(String token) {
+        return extractClaim(token, Claims::getExpiration);
     }
 
     @Override
@@ -158,8 +182,13 @@ public class JwtService implements TokenService {
     public Integer getAccessTokenExpirationMs() {
         return accessTokenExpirationMs;
     }
+
     public Integer getRefreshTokenExpirationMs() {
         return refreshTokenExpirationMs;
+    }
+
+    public Integer getMailVerificationTokenExpirationMs() {
+        return mailVerificationTokenExpirationMs;
     }
 
     private SignatureAlgorithm getSignatureAlgorithm() {

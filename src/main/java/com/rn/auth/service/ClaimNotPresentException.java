@@ -9,8 +9,4 @@ public class ClaimNotPresentException extends RuntimeException {
     public ClaimNotPresentException(String message){
         super(message);
     }
-
-    public String getMessage(){
-        return super.getMessage();
-    }
 }

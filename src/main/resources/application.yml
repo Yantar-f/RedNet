@@ -1,38 +1,48 @@
 server:
-  port: 8080
-  error:
-    include-message: always
-    include-binding-errors: always
+    port: 8080
+    error:
+        include-message: always
+        include-binding-errors: always
 
 spring:
-  datasource:
-    url: jdbc:postgresql://localhost:5432/RedNetDB
-    username: postgres
-    password: 123
-    driver-class-name: org.postgresql.Driver
-  jpa:
-    database: postgresql
-    open-in-view: false
-    show-sql: true
-    hibernate:
-      ddl-auto: create-drop
-    properties:
-      hibernate:
-        dialect: org.hibernate.dialect.PostgreSQLDialect
-        format_sql: true
-      jakarta:
-        persistence:
-          sharedCache:
-            mode: ENABLE_SELECTIVE
-
+    datasource:
+        url: jdbc:postgresql://localhost:5432/RedNetDB
+        username: postgres
+        password: 123
+        driver-class-name: org.postgresql.Driver
+    jpa:
+        database: postgresql
+        open-in-view: false
+        show-sql: true
+        hibernate:
+            ddl-auto: create-drop
+        properties:
+            hibernate:
+                dialect: org.hibernate.dialect.PostgreSQLDialect
+                format_sql: true
+            jakarta:
+                persistence:
+                    sharedCache:
+                        mode: ENABLE_SELECTIVE
+    mail:
+        host: smtp.yandex.ru
+        port: 465
+        username: shevchenkomo@stud.omsu.ru
+        password: kuiminpvdsapxfxt
+        protocol: smtps
+        default-encoding: UTF-8
 RedNet:
-  app:
-    passwordEncoderStrength: 10
-    accessTokenCookieName: rednet-jwt-access
-    accessTokenExpirationMs: 1800000
-    accessTokenPath: /api
-    refreshTokenCookieName: rednet-jwt-refresh
-    refreshTokenExpirationMs: 180000000
-    refreshTokenPath: /api/auth
-    jwt:
-      secretKey: 67556B58703273357638792F423F4428472B4B6250655368566D597133743677
+    app:
+        passwordEncoderStrength: 10
+        accessTokenCookieName: rednet-jwt-access
+        accessTokenExpirationMs: 1800000
+        accessTokenPath: /api
+        refreshTokenCookieName: rednet-jwt-refresh
+        refreshTokenExpirationMs: 180000000
+        refreshTokenPath: /api/auth
+        mailVerificationTokenExpirationMs: 150000
+        verificationLink: http://localhost:8080/api/auth/verify?token=
+        verificationEmailSubject: RedNet Email Verification
+        emailVerifiedLink: http://localhost:8080/api/test
+        jwt:
+            secretKey: 67556B58703273357638792F423F4428472B4B6250655368566D597133743677

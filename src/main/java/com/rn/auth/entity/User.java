@@ -56,6 +56,9 @@ public class User /*extends StatisticableEntity*/ {
         inverseJoinColumns = @JoinColumn(name = "role_id"))
     Set<Role> roles = new HashSet<>();
 
+    @Column(name = "enabled")
+    private boolean enabled = false;
+
 
 
 
@@ -66,11 +69,13 @@ public class User /*extends StatisticableEntity*/ {
     public User(
         String username,
         String email,
-        String password
+        String password,
+        Set<Role> roles
     ) {
         this.username = username;
         this.email = email;
         this.password = password;
+        this.roles = roles;
     }
 
 
@@ -96,6 +101,10 @@ public class User /*extends StatisticableEntity*/ {
         return  roles;
     }
 
+    public boolean isEnabled() {
+        return enabled;
+    }
+
     public void setId(Long id) {
         this.id = id;
     }
@@ -118,5 +127,9 @@ public class User /*extends StatisticableEntity*/ {
 
     public void addRole(Role role) {
         roles.add(role);
+    }
+
+    public void setEnabled(boolean status) {
+        enabled = status;
     }
 }

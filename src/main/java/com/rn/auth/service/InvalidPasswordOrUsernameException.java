@@ -10,8 +10,4 @@ public class InvalidPasswordOrUsernameException extends RuntimeException{
         super("Bad credentials");
     }
 
-    @Override
-    public String getMessage(){
-        return super.getMessage();
-    }
 }
