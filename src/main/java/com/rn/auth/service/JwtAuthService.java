@@ -113,15 +113,15 @@ public class JwtAuthService implements AuthService {
         Optional<RefreshToken> optionalRefreshToken = refreshTokenRepository.findByUser_Id(user.getId());
 
         if(optionalRefreshToken.isPresent()) {
-            if(!authTokenService.isTokenValid(optionalRefreshToken.get().getToken())){
+            if(authTokenService.isTokenValid(optionalRefreshToken.get().getToken())){
+                refreshToken = optionalRefreshToken.get().getToken();
+            } else {
                 refreshToken = authTokenService.generateRefreshToken(user);
                 refreshTokenRepository.updateToken(
                     optionalRefreshToken.get().getId(),
                     refreshToken,
                     authTokenService.extractExpiration(refreshToken)
                 );
-            } else {
-                refreshToken = optionalRefreshToken.get().getToken();
             }
         } else {
             refreshToken = authTokenService.generateRefreshToken(user);

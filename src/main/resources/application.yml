@@ -31,9 +31,10 @@ spring:
         password: kuiminpvdsapxfxt
         protocol: smtps
         default-encoding: UTF-8
+
 RedNet:
     app:
-        passwordEncoderStrength: 10
+        passwordEncoderStrength: 100
         accessTokenCookieName: rednet-jwt-access
         accessTokenExpirationMs: 1800000
         accessTokenPath: /api
