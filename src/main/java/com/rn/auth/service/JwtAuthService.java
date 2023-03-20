@@ -1,13 +1,19 @@
 package com.rn.auth.service;
 
+import com.rn.auth.entity.EmailVerificationCredentials;
 import com.rn.auth.entity.EnumRole;
 import com.rn.auth.entity.RefreshToken;
 import com.rn.auth.entity.Role;
 import com.rn.auth.entity.User;
+import com.rn.auth.exception.CookieNotPresentException;
+import com.rn.auth.exception.InvalidPasswordOrUsernameException;
+import com.rn.auth.exception.InvalidTokenException;
+import com.rn.auth.exception.OccupiedValueException;
 import com.rn.auth.payload.SimpleResponseBody;
 import com.rn.auth.payload.SignInRequestBody;
 import com.rn.auth.payload.SignInResponseBody;
 import com.rn.auth.payload.SignUpRequestBody;
+import com.rn.auth.repository.EmailVerificationCredentialsRepository;
 import com.rn.auth.repository.RefreshTokenRepository;
 import com.rn.auth.repository.UserRepository;
 import jakarta.servlet.http.Cookie;
@@ -26,8 +32,10 @@ import org.springframework.stereotype.Service;
 
 import java.net.URI;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.Optional;
 import java.util.Set;
+import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
 @Service
@@ -35,6 +43,7 @@ public class JwtAuthService implements AuthService {
 
     private final UserRepository userRepository;
     private final RefreshTokenRepository refreshTokenRepository;
+    private final EmailVerificationCredentialsRepository emailVerificationCredentialsRepository;
     private final PasswordEncoder passwordEncoder;
     private final AuthTokenService authTokenService;
     private final AuthEmailService authEmailService;
@@ -43,6 +52,11 @@ public class JwtAuthService implements AuthService {
     private final String accessTokenPath;
     private final String refreshTokenPath;
     private final String emailVerifiedLink;
+    private final Integer emailVerificationRefreshTokenExpirationMs;
+    private final Integer emailVerificationRefreshTokenActivationMs;
+    private final Integer emailVerificationTokenExpirationMs;
+    private final String emailVerificationRefreshTokenCookieName;
+    private final String emailVerificationRefreshTokenPath;
 
 
 
@@ -51,6 +65,7 @@ public class JwtAuthService implements AuthService {
     private JwtAuthService(
         UserRepository userRepository,
         RefreshTokenRepository refreshTokenRepository,
+        EmailVerificationCredentialsRepository emailVerificationCredentialsRepository,
         PasswordEncoder passwordEncoder,
         AuthTokenService authTokenService,
         AuthEmailService authEmailService,
@@ -58,10 +73,16 @@ public class JwtAuthService implements AuthService {
         @Value("${RedNet.app.refreshTokenCookieName}") String refreshTokenCookieName,
         @Value("${RedNet.app.accessTokenPath}") String accessTokenPath,
         @Value("${RedNet.app.refreshTokenPath}") String refreshTokenPath,
-        @Value("${RedNet.app.emailVerifiedLink}") String emailVerifiedLink
+        @Value("${RedNet.app.email.verifiedRedirectLink}") String emailVerifiedLink,
+        @Value("${RedNet.app.email.verificationRefreshTokenExpirationMs}") Integer emailVerificationRefreshTokenExpirationMs,
+        @Value("${RedNet.app.email.verificationRefreshTokenActivationMs}")Integer emailVerificationRefreshTokenActivationMs,
+        @Value("${RedNet.app.email.verificationTokenExpirationMs}") Integer emailVerificationTokenExpirationMs,
+        @Value("${RedNet.app.email.verificationRefreshTokenPath}") String emailVerificationRefreshTokenPath,
+        @Value("${RedNet.app.email.verificationRefreshTokenCookieName}") String emailVerificationRefreshTokenCookieName
     ) {
         this.userRepository = userRepository;
         this.refreshTokenRepository = refreshTokenRepository;
+        this.emailVerificationCredentialsRepository = emailVerificationCredentialsRepository;
         this.passwordEncoder = passwordEncoder;
         this.authTokenService = authTokenService;
         this.authEmailService = authEmailService;
@@ -70,6 +91,11 @@ public class JwtAuthService implements AuthService {
         this.accessTokenPath = accessTokenPath;
         this.refreshTokenPath = refreshTokenPath;
         this.emailVerifiedLink = emailVerifiedLink;
+        this.emailVerificationRefreshTokenExpirationMs = emailVerificationRefreshTokenExpirationMs;
+        this.emailVerificationRefreshTokenActivationMs = emailVerificationRefreshTokenActivationMs;
+        this.emailVerificationTokenExpirationMs = emailVerificationTokenExpirationMs;
+        this.emailVerificationRefreshTokenPath = emailVerificationRefreshTokenPath;
+        this.emailVerificationRefreshTokenCookieName = emailVerificationRefreshTokenCookieName;
     }
 
 
@@ -92,9 +118,24 @@ public class JwtAuthService implements AuthService {
 
         setAuthentication(user);
 
-        authEmailService.sendEmail(user.getEmail(), authTokenService.generateEmailVerificationToken(user));
+        EmailVerificationCredentials emailVerificationCredentials = new EmailVerificationCredentials(
+            UUID.randomUUID().toString(),
+            UUID.randomUUID().toString(),
+            new Date(System.currentTimeMillis() + emailVerificationTokenExpirationMs),
+            new Date(System.currentTimeMillis() + emailVerificationRefreshTokenActivationMs),
+            new Date(System.currentTimeMillis() + emailVerificationRefreshTokenExpirationMs),
+            user
+        );
 
-        return ResponseEntity.ok().build();
+        emailVerificationCredentialsRepository.save(emailVerificationCredentials);
+
+        authEmailService.sendEmail(user.getEmail(),emailVerificationCredentials.getToken());
+
+        return ResponseEntity.ok()
+            .header(
+                HttpHeaders.SET_COOKIE,
+                generateEmailVerificationCookie(emailVerificationCredentials.getRefreshToken()).toString()
+            ).build();
     }
 
     @Override
@@ -178,7 +219,7 @@ public class JwtAuthService implements AuthService {
 
         String cookieRefreshToken = Arrays.stream(cookies)
             .filter(cookie -> cookie.getName().equals(refreshTokenCookieName))
-            .findFirst().orElseThrow(() -> new CookieNotPresentException(refreshTokenCookieName))
+            .findFirst().orElseThrow(CookieNotPresentException::new)
             .getValue();
 
         if (!authTokenService.isTokenValid(cookieRefreshToken)) {
@@ -210,16 +251,13 @@ public class JwtAuthService implements AuthService {
     }
 
     @Override
-    public ResponseEntity<SignInResponseBody> verify(String token) {
-        if(!authTokenService.isTokenValid(token)) {
-            throw new InvalidTokenException(token);
-        }
+    public ResponseEntity<SignInResponseBody> verify(String emailVerificationToken) {
+        EmailVerificationCredentials emailVerificationCredentials = emailVerificationCredentialsRepository.findEagerByToken(emailVerificationToken)
+            .orElseThrow(() -> new InvalidTokenException(emailVerificationToken));
 
-        Long userId = Long.valueOf(authTokenService.extractSubject(token));
-        userRepository.enableUserById(userId);
+        User user = emailVerificationCredentials.getUser();
+        userRepository.enableUserById(user.getId());
 
-        User user = userRepository.findEagerById(userId)
-            .orElseThrow(InvalidPasswordOrUsernameException::new);
         String accessToken = authTokenService.generateAccessToken(user);
         String refreshToken = authTokenService.generateRefreshToken(user);
 
@@ -231,7 +269,13 @@ public class JwtAuthService implements AuthService {
             )
         );
 
+        emailVerificationCredentialsRepository.deleteById(emailVerificationCredentials.getId());
+
         return ResponseEntity.status(HttpStatus.FOUND).location(URI.create(emailVerifiedLink))
+            .header(
+                HttpHeaders.SET_COOKIE,
+                generateCleaningCookie(emailVerificationRefreshTokenCookieName, emailVerificationRefreshTokenPath).toString()
+            )
             .header(
                 HttpHeaders.SET_COOKIE,
                 generateAccessCookie(accessToken).toString()
@@ -248,7 +292,49 @@ public class JwtAuthService implements AuthService {
                         .toList()
                 )
             );
+    }
 
+    @Override
+    public ResponseEntity<Object> resendVerification(HttpServletRequest request) {
+        Cookie[] cookies = request.getCookies();
+
+        if (cookies == null) {
+            throw new CookieNotPresentException();
+        }
+
+        String cookieEmailVerificationRefreshToken = Arrays.stream(cookies)
+            .filter(cookie -> cookie.getName().equals(emailVerificationRefreshTokenCookieName))
+            .findFirst().orElseThrow(CookieNotPresentException::new)
+            .getValue();
+        EmailVerificationCredentials emailVerificationCredentials = emailVerificationCredentialsRepository.findWithUserByRefreshToken(cookieEmailVerificationRefreshToken)
+            .orElseThrow(() -> new InvalidTokenException(cookieEmailVerificationRefreshToken));
+        Date curDate = new Date();
+
+        if(
+            emailVerificationCredentials.getRefreshTokenActivation().after(curDate) ||
+            emailVerificationCredentials.getRefreshTokenExpiration().before(curDate)
+        ) {
+            throw new InvalidTokenException(emailVerificationCredentials.getRefreshToken());
+        }
+
+        String emailVerificationRefreshToken = UUID.randomUUID().toString();
+        String emailVerificationToken = UUID.randomUUID().toString();
+
+        emailVerificationCredentialsRepository.updateCredentialsByRefreshToken(
+            cookieEmailVerificationRefreshToken,
+            emailVerificationToken,
+            emailVerificationRefreshToken,
+            new Date(System.currentTimeMillis() + emailVerificationTokenExpirationMs),
+            new Date(System.currentTimeMillis() + emailVerificationRefreshTokenActivationMs),
+            new Date(System.currentTimeMillis() + emailVerificationRefreshTokenExpirationMs)
+        );
+
+        authEmailService.sendEmail(emailVerificationCredentials.getUser().getEmail(),emailVerificationToken);
+        return ResponseEntity.ok()
+            .header(
+                HttpHeaders.SET_COOKIE,
+                generateEmailVerificationCookie(emailVerificationRefreshToken).toString()
+            ).build();
     }
 
 
@@ -279,6 +365,14 @@ public class JwtAuthService implements AuthService {
             .path(refreshTokenPath)
             .httpOnly(true)
             .maxAge(TimeUnit.MILLISECONDS.toSeconds(authTokenService.getRefreshTokenExpirationMs()))
+            .build();
+    }
+
+    private ResponseCookie generateEmailVerificationCookie(String value) {
+        return ResponseCookie.from(emailVerificationRefreshTokenCookieName, value)
+            .path(emailVerificationRefreshTokenPath)
+            .httpOnly(true)
+            .maxAge(TimeUnit.MILLISECONDS.toSeconds(emailVerificationRefreshTokenExpirationMs))
             .build();
     }
 

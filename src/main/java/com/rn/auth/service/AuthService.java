@@ -12,6 +12,6 @@ public interface AuthService {
     ResponseEntity<SignInResponseBody> signIn(SignInRequestBody request);
     ResponseEntity<SimpleResponseBody> signOut(HttpServletRequest request);
     ResponseEntity<SimpleResponseBody> refresh(HttpServletRequest request);
-
-    ResponseEntity<SignInResponseBody> verify(String token);
+    ResponseEntity<SignInResponseBody> verify(String emailVerificationToken);
+    ResponseEntity<Object> resendVerification(HttpServletRequest request);
 }

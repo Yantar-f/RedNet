@@ -1,4 +1,4 @@
-package com.rn.auth.service;
+package com.rn.auth.exception;
 
 public class InvalidPasswordOrUsernameException extends RuntimeException{
 

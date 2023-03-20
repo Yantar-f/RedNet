@@ -22,8 +22,8 @@ public class SimpleAuthEmailService implements AuthEmailService {
     public SimpleAuthEmailService(
         JavaMailSender emailSender,
         @Value("${spring.mail.username}") String sender,
-        @Value("${RedNet.app.verificationLink}") String verificationLink,
-        @Value("${RedNet.app.verificationEmailSubject}") String subject
+        @Value("${RedNet.app.email.verificationLink}") String verificationLink,
+        @Value("${RedNet.app.email.verificationSubject}") String subject
     ) {
         this.emailSender = emailSender;
         this.sender = sender;

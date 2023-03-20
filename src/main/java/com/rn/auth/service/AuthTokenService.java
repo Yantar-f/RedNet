@@ -19,8 +19,6 @@ public interface AuthTokenService {
     String generateAccessToken(Map<String, Object> extraClaims, User user);
     String generateRefreshToken(User user);
     String generateRefreshToken(Map<String, Object> extraClaims, User user);
-    String generateEmailVerificationToken(User user);
-    String generateEmailVerificationToken(Map<String, Object> extraClaims, User user);
     boolean isTokenValid(String token);
     <T> T extractClaim(String token, Function<Claims, T> claimsResolver);
     Claims extractAllClaims(String token);

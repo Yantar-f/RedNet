@@ -34,16 +34,21 @@ spring:
 
 RedNet:
     app:
-        passwordEncoderStrength: 100
+        passwordEncoderStrength: 10
         accessTokenCookieName: rednet-jwt-access
         accessTokenExpirationMs: 1800000
         accessTokenPath: /api
         refreshTokenCookieName: rednet-jwt-refresh
         refreshTokenExpirationMs: 180000000
         refreshTokenPath: /api/auth
-        mailVerificationTokenExpirationMs: 150000
-        verificationLink: http://localhost:8080/api/auth/verify?token=
-        verificationEmailSubject: RedNet Email Verification
-        emailVerifiedLink: http://localhost:8080/api/test
+        email:
+            verificationRefreshTokenCookieName: rednet-evt-refresh
+            verificationRefreshTokenExpirationMs: 300000
+            verificationRefreshTokenPath: /api/auth
+            verificationTokenExpirationMs: 150000
+            verificationRefreshTokenActivationMs: 70000
+            verificationLink: http://localhost:8080/api/auth/verify?token=
+            verifiedRedirectLink: http://localhost:8080/api/test
+            verificationSubject: RedNet Email Verification
         jwt:
             secretKey: 67556B58703273357638792F423F4428472B4B6250655368566D597133743677

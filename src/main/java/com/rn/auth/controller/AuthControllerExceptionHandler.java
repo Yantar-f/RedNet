@@ -1,10 +1,10 @@
 package com.rn.auth.controller;
 
 import com.rn.auth.payload.ErrorResponseBody;
-import com.rn.auth.service.CookieNotPresentException;
-import com.rn.auth.service.InvalidPasswordOrUsernameException;
-import com.rn.auth.service.InvalidTokenException;
-import com.rn.auth.service.OccupiedValueException;
+import com.rn.auth.exception.CookieNotPresentException;
+import com.rn.auth.exception.InvalidPasswordOrUsernameException;
+import com.rn.auth.exception.InvalidTokenException;
+import com.rn.auth.exception.OccupiedValueException;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

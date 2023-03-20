@@ -58,4 +58,9 @@ public class AuthController {
     public ResponseEntity<SignInResponseBody> verify(@RequestParam(name = "token") String token) {
         return authService.verify(token);
     }
+
+    @PostMapping("/resend-verification")
+    public ResponseEntity<?> resendVerification(HttpServletRequest request) {
+        return authService.resendVerification(request);
+    }
 }

@@ -1,6 +1,7 @@
 package com.rn.auth.service;
 
 import com.rn.auth.entity.User;
+import com.rn.auth.exception.ClaimNotPresentException;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.JwtBuilder;
@@ -29,7 +30,6 @@ public class SimpleAuthTokenService implements AuthTokenService {
     private final String secretKey;
     private final Integer accessTokenExpirationMs;
     private final Integer refreshTokenExpirationMs;
-    private final Integer mailVerificationTokenExpirationMs;
     private final SignatureAlgorithm signatureAlgorithm = SignatureAlgorithm.HS256;
 
 
@@ -38,13 +38,11 @@ public class SimpleAuthTokenService implements AuthTokenService {
     public SimpleAuthTokenService(
         @Value("${RedNet.app.jwt.secretKey}") String secretKey,
         @Value("${RedNet.app.accessTokenExpirationMs}") Integer accessTokenExpirationMs,
-        @Value("${RedNet.app.refreshTokenExpirationMs}") Integer refreshTokenExpirationMs,
-        @Value("${RedNet.app.mailVerificationTokenExpirationMs}") Integer mailVerificationTokenExpirationMs
+        @Value("${RedNet.app.refreshTokenExpirationMs}") Integer refreshTokenExpirationMs
     ) {
         this.secretKey = secretKey;
         this.accessTokenExpirationMs = accessTokenExpirationMs;
         this.refreshTokenExpirationMs = refreshTokenExpirationMs;
-        this.mailVerificationTokenExpirationMs = mailVerificationTokenExpirationMs;
     }
 
 
@@ -84,20 +82,6 @@ public class SimpleAuthTokenService implements AuthTokenService {
                 .setSubject(user.getId().toString())
                 .setExpiration(new Date(System.currentTimeMillis() + getRefreshTokenExpirationMs()))
                 .compact();
-    }
-
-    @Override
-    public String generateEmailVerificationToken(User user) {
-        return generateEmailVerificationToken(new HashMap<>(),user);
-    }
-
-    @Override
-    public String generateEmailVerificationToken(Map<String, Object> extraClaims, User user) {
-        return getInitialBuilder()
-            .setClaims(extraClaims)
-            .setSubject(user.getId().toString())
-            .setExpiration(new Date(System.currentTimeMillis() + getMailVerificationTokenExpirationMs()))
-            .compact();
     }
 
     @Override
@@ -185,10 +169,6 @@ public class SimpleAuthTokenService implements AuthTokenService {
 
     public Integer getRefreshTokenExpirationMs() {
         return refreshTokenExpirationMs;
-    }
-
-    public Integer getMailVerificationTokenExpirationMs() {
-        return mailVerificationTokenExpirationMs;
     }
 
     private SignatureAlgorithm getSignatureAlgorithm() {
