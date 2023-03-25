@@ -2,12 +2,14 @@
 # Reference: https://intellij-support.jetbrains.com/hc/en-us/articles/206544839
 
 # IntelliJ
-out/
-.idea/
+
+out
+.idea
 .idea_modules
 
 #build
-target/
+target
+
 
 # File-based project format
 *.iws
