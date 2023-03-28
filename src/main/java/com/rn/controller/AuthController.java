@@ -22,12 +22,12 @@ import org.springframework.web.bind.annotation.RestController;
 public class AuthController {
 
 
-    private static final String SIGN_UP_PATH = "/signup";
-    private static final String SIGN_IN_PATH = "/signin";
-    private static final String SIGN_OUT_PATH = "/signout";
-    private static final String REFRESH_TOKEN_PATH = "/refresh-token";
-    private static final String VERIFY_EMAIL_PATH = "/verify-email";
-    private static final String RESEND_EMAIL_VERIFICATION_PATH = "/resend-email-verification";
+    public static final String SIGN_UP_PATH = "/signup";
+    public static final String SIGN_IN_PATH = "/signin";
+    public static final String SIGN_OUT_PATH = "/signout";
+    public static final String REFRESH_TOKEN_PATH = "/refresh-token";
+    public static final String VERIFY_EMAIL_PATH = "/verify-email";
+    public static final String RESEND_EMAIL_VERIFICATION_PATH = "/resend-email-verification";
     private final AuthService authService;
 
 
