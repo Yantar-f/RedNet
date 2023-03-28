@@ -21,8 +21,14 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping ("/api/auth")
 public class AuthController {
 
-    private final AuthService authService;
 
+    public static final String SIGN_UP_PATH = "/signup";
+    public static final String SIGN_IN_PATH = "/signin";
+    public static final String SIGN_OUT_PATH = "/signout";
+    public static final String REFRESH_TOKEN_PATH = "/refresh-token";
+    public static final String VERIFY_EMAIL_PATH = "/verify-email";
+    public static final String RESEND_EMAIL_VERIFICATION_PATH = "/resend-email-verification";
+    private final AuthService authService;
 
 
 
@@ -34,33 +40,33 @@ public class AuthController {
 
 
 
-    @PostMapping ("/signup")
+    @PostMapping(SIGN_UP_PATH)
     public ResponseEntity<?> signUp(@RequestBody @Valid SignUpRequestBody request) {
         return authService.signUp(request);
     }
 
-    @PostMapping("/signin")
+    @PostMapping(SIGN_IN_PATH)
     public ResponseEntity<?> signIn(@RequestBody @Valid SignInRequestBody request) {
         return authService.signIn(request);
     }
 
-    @PostMapping("/signout")
+    @PostMapping(SIGN_OUT_PATH)
     public ResponseEntity<?> signOut(HttpServletRequest request) {
         return authService.signOut(request);
     }
 
-    @PostMapping("/refresh")
-    public ResponseEntity<?> refresh(HttpServletRequest request) {
-        return authService.refresh(request);
+    @PostMapping(REFRESH_TOKEN_PATH)
+    public ResponseEntity<?> refreshToken(HttpServletRequest request) {
+        return authService.refreshToken(request);
     }
 
-    @GetMapping("/verify")
-    public ResponseEntity<SignInResponseBody> verify(@RequestParam(name = "token") String token) {
-        return authService.verify(token);
+    @GetMapping(VERIFY_EMAIL_PATH)
+    public ResponseEntity<SignInResponseBody> verifyEmail(@RequestParam(name = "token") String token) {
+        return authService.verifyEmail(token);
     }
 
-    @PostMapping("/resend-verification")
-    public ResponseEntity<?> resendVerification(HttpServletRequest request) {
-        return authService.resendVerification(request);
+    @PostMapping(RESEND_EMAIL_VERIFICATION_PATH)
+    public ResponseEntity<?> resendEmailVerification(HttpServletRequest request) {
+        return authService.resendEmailVerification(request);
     }
 }
