@@ -210,7 +210,7 @@ public class JwtAuthService implements AuthService {
     }
 
     @Override
-    public ResponseEntity<SimpleResponseBody> refresh(HttpServletRequest request) {
+    public ResponseEntity<SimpleResponseBody> refreshToken(HttpServletRequest request) {
         Cookie[] cookies = request.getCookies();
 
         if (cookies == null) {
@@ -251,7 +251,7 @@ public class JwtAuthService implements AuthService {
     }
 
     @Override
-    public ResponseEntity<SignInResponseBody> verify(String emailVerificationToken) {
+    public ResponseEntity<SignInResponseBody> verifyEmail(String emailVerificationToken) {
         EmailVerificationCredentials emailVerificationCredentials = emailVerificationCredentialsRepository.findEagerByToken(emailVerificationToken)
             .orElseThrow(() -> new InvalidTokenException(emailVerificationToken));
 
@@ -295,7 +295,7 @@ public class JwtAuthService implements AuthService {
     }
 
     @Override
-    public ResponseEntity<Object> resendVerification(HttpServletRequest request) {
+    public ResponseEntity<Object> resendEmailVerification(HttpServletRequest request) {
         Cookie[] cookies = request.getCookies();
 
         if (cookies == null) {
