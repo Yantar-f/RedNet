@@ -16,12 +16,14 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import static com.rn.controller.AuthController.MAIN_PATH;
+
 
 @RestController
-@RequestMapping ("/api/auth")
+@RequestMapping (MAIN_PATH)
 public class AuthController {
 
-
+    public static final String MAIN_PATH = "/api/auth";
     public static final String SIGN_UP_PATH = "/signup";
     public static final String SIGN_IN_PATH = "/signin";
     public static final String SIGN_OUT_PATH = "/signout";

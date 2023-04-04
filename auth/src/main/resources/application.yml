@@ -3,7 +3,6 @@ server:
     error:
         include-message: always
         include-binding-errors: always
-
 spring:
     datasource:
         url: jdbc:postgresql://localhost:5432/RedNetDB
@@ -31,7 +30,6 @@ spring:
         password: kuiminpvdsapxfxt
         protocol: smtps
         default-encoding: UTF-8
-
 RedNet:
     app:
         passwordEncoderStrength: 10
