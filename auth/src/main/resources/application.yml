@@ -5,7 +5,7 @@ server:
         include-binding-errors: always
 spring:
     datasource:
-        url: jdbc:postgresql://localhost:5432/RedNetDB
+        url: jdbc:postgresql://localhost/RedNetDB
         username: postgres
         password: 123
         driver-class-name: org.postgresql.Driver
@@ -45,7 +45,7 @@ RedNet:
             verificationRefreshTokenPath: /api/auth
             verificationTokenExpirationMs: 150000
             verificationRefreshTokenActivationMs: 70000
-            verificationLink: http://localhost:8080/api/auth/verify?token=
+            verificationLink: http://localhost:8080/api/auth/verify-email?token=
             verifiedRedirectLink: http://localhost:8080/api/test
             verificationSubject: RedNet Email Verification
         jwt:

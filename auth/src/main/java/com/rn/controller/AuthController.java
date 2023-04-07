@@ -30,6 +30,7 @@ public class AuthController {
     public static final String REFRESH_TOKEN_PATH = "/refresh-token";
     public static final String VERIFY_EMAIL_PATH = "/verify-email";
     public static final String RESEND_EMAIL_VERIFICATION_PATH = "/resend-email-verification";
+    public static final String VERIFY_REQUEST = "/verify-request";
     private final AuthService authService;
 
 
@@ -70,5 +71,10 @@ public class AuthController {
     @PostMapping(RESEND_EMAIL_VERIFICATION_PATH)
     public ResponseEntity<?> resendEmailVerification(HttpServletRequest request) {
         return authService.resendEmailVerification(request);
+    }
+
+    @GetMapping(VERIFY_REQUEST)
+    public ResponseEntity<Boolean> verifyRequest(HttpServletRequest request) {
+        return authService.verifyRequest(request);
     }
 }

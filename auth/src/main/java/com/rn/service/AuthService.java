@@ -14,4 +14,5 @@ public interface AuthService {
     ResponseEntity<SimpleResponseBody> refreshToken(HttpServletRequest request);
     ResponseEntity<SignInResponseBody> verifyEmail(String emailVerificationToken);
     ResponseEntity<Object> resendEmailVerification(HttpServletRequest request);
+    ResponseEntity<Boolean> verifyRequest(HttpServletRequest request);
 }
