@@ -111,7 +111,7 @@
 
 
   <build>
-    <finalName>red-net</finalName>
+    <finalName>red-net-auth</finalName>
 
     <plugins>
       <plugin>

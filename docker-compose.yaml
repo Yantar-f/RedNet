@@ -1,0 +1,31 @@
+version: '3.0'
+
+services:
+    database:
+        image: postgres
+        networks:
+            - auth-network
+        ports:
+            - "5432:5432"
+        environment:
+            POSTGRES_DB: RedNetDB
+            POSTGRES_USER: postgres
+            POSTGRES_PASSWORD: 123
+
+    api:
+        build: ./auth
+        env_file:
+            -   ./auth/.env
+        environment:
+            - SPRING_DATASOURCE_URL=jdbc:postgresql://database:5432/RedNetDB
+            - SPRING_DATASOURCE_USERNAME=postgres
+            - SPRING_DATASOURCE_PASSWORD=123
+        networks:
+            - auth-network
+        ports:
+            - "8080:8080"
+        depends_on:
+            - database
+        restart: unless-stopped
+networks:
+    auth-network:
