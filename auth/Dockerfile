@@ -1,6 +1,5 @@
-FROM maven:3.9.0-amazoncorretto-17 as build
+FROM amazoncorretto:17 as build
 WORKDIR /app
-COPY . .
-RUN mvn package
+COPY target .
 EXPOSE 8080
-CMD ["java", "-jar", "/app/target/red-net.jar"]
+CMD ["java", "-jar", "/app/red-net-auth.jar"]

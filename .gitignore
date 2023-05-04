@@ -7,10 +7,6 @@ out
 .idea
 .idea_modules
 
-#build
-target
-
-
 # File-based project format
 *.iws
 

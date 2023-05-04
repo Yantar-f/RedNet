@@ -14,12 +14,8 @@ services:
 
     auth-service:
         build: ./auth
-#        env_file:
-#            -   ./auth/.env
-        environment:
-            - SPRING_DATASOURCE_URL=jdbc:postgresql://auth-service-database:5432/RedNetDB
-            - SPRING_DATASOURCE_USERNAME=postgres
-            - SPRING_DATASOURCE_PASSWORD=123
+        env_file:
+            -   ./auth/.env
         networks:
             - auth-network
         ports:

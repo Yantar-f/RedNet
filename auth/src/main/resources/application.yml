@@ -26,8 +26,8 @@ spring:
     mail:
         host: smtp.yandex.ru
         port: 465
-        username: shevchenkomo@stud.omsu.ru
-        password: kuiminpvdsapxfxt
+        username: ${AUTH_MAIL_USERNAME}
+        password: ${AUTH_MAIL_PASSWORD}
         protocol: smtps
         default-encoding: UTF-8
 RedNet:
@@ -49,4 +49,4 @@ RedNet:
             verifiedRedirectLink: http://localhost:8080/api/test
             verificationSubject: RedNet Email Verification
         jwt:
-            secretKey: 67556B58703273357638792F423F4428472B4B6250655368566D597133743677
+            secretKey: ${AUTH_JWT_SECRET_KEY}
