@@ -5,9 +5,9 @@ server:
         include-binding-errors: always
 spring:
     datasource:
-        url: jdbc:postgresql://database:5432/RedNetDB
-        username: postgres
-        password: 123
+        url: ${AUTH_DATABASE_URL}
+        username: ${AUTH_DATABASE_USERNAME}
+        password: ${AUTH_DATABASE_PASSWORD}
         driver-class-name: org.postgresql.Driver
     jpa:
         database: postgresql
