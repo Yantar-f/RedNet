@@ -14,8 +14,8 @@ services:
 
     api:
         build: ./auth
-        env_file:
-            -   ./auth/.env
+#        env_file:
+#            -   ./auth/.env
         environment:
             - SPRING_DATASOURCE_URL=jdbc:postgresql://database:5432/RedNetDB
             - SPRING_DATASOURCE_USERNAME=postgres
