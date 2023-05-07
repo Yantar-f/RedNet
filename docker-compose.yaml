@@ -1,0 +1,27 @@
+version: '3.0'
+
+services:
+    auth-service-database:
+        image: postgres
+        networks:
+            - auth-network
+        ports:
+            - "5432:5432"
+        environment:
+            POSTGRES_DB: RedNetDB
+            POSTGRES_USER: postgres
+            POSTGRES_PASSWORD: 123
+
+    auth-service:
+        build: ./auth
+        env_file:
+            -   ./auth/.env
+        networks:
+            - auth-network
+        ports:
+            - "8080:8080"
+        depends_on:
+            - auth-service-database
+        restart: unless-stopped
+networks:
+    auth-network:
