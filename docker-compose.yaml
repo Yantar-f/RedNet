@@ -1,0 +1,14 @@
+version: '3.0'
+
+services:
+    api-gateway-service:
+        build: ./api-gateway
+        env_file:
+            -   ./api-gateway/.env
+        networks:
+            - api-gateway-network
+        ports:
+            - "9000:9000"
+        restart: unless-stopped
+networks:
+    api-gateway-network:
