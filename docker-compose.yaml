@@ -1,10 +1,10 @@
 version: '3.0'
 
 services:
-    auth-service-database:
+    user-service-database:
         image: postgres
         networks:
-            - auth-network
+            - user-service-network
         ports:
             - "5432:5432"
         environment:
@@ -12,16 +12,16 @@ services:
             POSTGRES_USER: postgres
             POSTGRES_PASSWORD: 123
 
-    auth-service:
-        build: ./auth
+    user-service:
+        build: ./user-service
         env_file:
-            -   ./auth/.env
+            -   ./user-service/.env
         networks:
-            - auth-network
+            - user-service-network
         ports:
             - "8080:8080"
         depends_on:
-            - auth-service-database
+            - user-service-database
         restart: unless-stopped
 networks:
-    auth-network:
+    user-service-network:
