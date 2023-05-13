@@ -19,4 +19,4 @@ RedNet:
         refreshTokenCookiePath: /api/auth
         refreshTokenCookieExpirationMs: 180000000
         jwt:
-            secretKey:  67556B58703273357638792F423F4428472B4B6250655368566D597133743677 #${AUTH_JWT_SECRET_KEY}
+            secretKey:  ${AUTH_JWT_SECRET_KEY}

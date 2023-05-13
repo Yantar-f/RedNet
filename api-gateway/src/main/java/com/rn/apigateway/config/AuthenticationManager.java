@@ -32,7 +32,7 @@ public class AuthenticationManager implements ReactiveAuthenticationManager {
     public Mono<Authentication> authenticate(Authentication authentication) {
         String accessToken = authentication.getPrincipal().toString();
 
-        if (!jwtService.isTokenValid(accessToken)) {
+        if (jwtService.isTokenInvalid(accessToken)) {
             return Mono.empty();
         }
 

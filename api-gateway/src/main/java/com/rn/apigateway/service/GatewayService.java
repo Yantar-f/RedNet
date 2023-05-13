@@ -36,7 +36,7 @@ public class GatewayService {
 
         if (oldRefreshTokenCookie == null) {
             return ServerResponse.badRequest().build();
-        } else if (!jwtService.isTokenValid(oldRefreshTokenCookie.getValue())) {
+        } else if (jwtService.isTokenInvalid(oldRefreshTokenCookie.getValue())) {
             return ServerResponse.status(HttpStatus.FORBIDDEN.value()).build();
         }
 
@@ -46,7 +46,6 @@ public class GatewayService {
                 .cookie(cookieService.generateAccessTokenCleaningCookie())
                 .cookie(cookieService.generateRefreshTokenCleaningCookie())
                 .build());
-
     }
 
     public Mono<ServerResponse> refreshToken(ServerRequest request) {
@@ -54,7 +53,7 @@ public class GatewayService {
 
         if (oldRefreshTokenCookie == null) {
             return ServerResponse.badRequest().build();
-        } else if (!jwtService.isTokenValid(oldRefreshTokenCookie.getValue())) {
+        } else if (jwtService.isTokenInvalid(oldRefreshTokenCookie.getValue())) {
             return ServerResponse.status(HttpStatus.FORBIDDEN.value()).build();
         }
 
