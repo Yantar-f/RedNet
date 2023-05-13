@@ -3,8 +3,6 @@ version: '3.0'
 services:
     user-service-database:
         image: postgres
-        networks:
-            - user-service-network
         ports:
             - "5432:5432"
         environment:
@@ -16,12 +14,12 @@ services:
         build: ./user-service
         env_file:
             -   ./user-service/.env
-        networks:
-            - user-service-network
         ports:
             - "8080:8080"
         depends_on:
             - user-service-database
         restart: unless-stopped
 networks:
-    user-service-network:
+    default:
+        external:
+            name: red-net-network

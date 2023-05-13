@@ -24,8 +24,8 @@ import static com.rn.controller.UserController.MAIN_PATH;
 public class UserController {
 
     public static final String MAIN_PATH = "/api/user";
-    public static final String SIGN_UP_PATH = "/create";
-    public static final String SIGN_IN_PATH = "/authenticate";
+    public static final String CREATE_USER_PATH = "/create";
+    public static final String AUTHENTICATE_USER_PATH = "/authenticate";
     public static final String VERIFY_EMAIL_PATH = "/verify-email";
     public static final String RESEND_EMAIL_VERIFICATION_PATH = "/resend-email-verification";
     private final UserService userService;
@@ -40,12 +40,12 @@ public class UserController {
 
 
 
-    @PostMapping(SIGN_UP_PATH)
+    @PostMapping(CREATE_USER_PATH)
     public ResponseEntity<?> create(@RequestBody @Valid UserCreationRequestBody request) {
         return userService.create(request);
     }
 
-    @PostMapping(SIGN_IN_PATH)
+    @PostMapping(AUTHENTICATE_USER_PATH)
     public ResponseEntity<?> authenticate(@RequestBody @Valid UserAuthenticationRequestBody request) {
         return userService.authenticate(request);
     }
