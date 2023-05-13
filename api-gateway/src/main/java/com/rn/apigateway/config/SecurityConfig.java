@@ -50,10 +50,9 @@ public class SecurityConfig {
             .authenticationManager(authenticationManager)
             .securityContextRepository(securityContextRepository)
             .authorizeExchange(ae -> ae
-                .pathMatchers("/api/res2/**").permitAll()
-                .pathMatchers(RouteConfig.AUTH_PATH + "/**").permitAll()
-                .pathMatchers(RouteConfig.AUTH_PATH + "/test/user").authenticated()
-                .pathMatchers(RouteConfig.AUTH_PATH + "/test/admin").hasAuthority("ROLE_ADMIN")
+                .pathMatchers(RoutingConfig.AUTH_PATH + "/test/user").authenticated()
+                .pathMatchers(RoutingConfig.AUTH_PATH + "/test/admin").hasAuthority("ROLE_ADMIN")
+                .pathMatchers(RoutingConfig.AUTH_PATH + "/**").permitAll()
                 .anyExchange().permitAll())
             .build();
     }

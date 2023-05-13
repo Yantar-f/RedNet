@@ -1,5 +1,5 @@
 FROM amazoncorretto:17 as build
 WORKDIR /app
 COPY target .
-EXPOSE 8080
+EXPOSE 9000
 CMD ["java", "-jar", "/app/red-net-api-gateway.jar"]

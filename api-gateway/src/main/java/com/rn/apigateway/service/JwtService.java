@@ -1,7 +1,7 @@
 package com.rn.apigateway.service;
 
 import com.rn.apigateway.exception.ClaimNotPresentException;
-import com.rn.apigateway.payload.AuthenticationResponseBody;
+import com.rn.apigateway.payload.AuthenticationBody;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.JwtBuilder;
@@ -46,37 +46,42 @@ public class JwtService {
 
 
 
-    public String generateAccessToken(AuthenticationResponseBody authenticationResponseBody) {
+    public String generateAccessToken(AuthenticationBody authenticationBody) {
         HashMap<String,Object> rolesClaims = new HashMap<>();
         rolesClaims.put(
             "roles",
-            authenticationResponseBody.getRoles()
+            authenticationBody.getRoles()
         );
-        return generateAccessToken(rolesClaims,authenticationResponseBody);
+        return generateAccessToken(rolesClaims, authenticationBody);
     }
 
     public String generateAccessToken(
         Map<String, Object> extraClaims,
-        AuthenticationResponseBody user
+        AuthenticationBody user
     ) {
         return getInitialBuilder()
             .setClaims(extraClaims)
-            .setSubject(user.getId().toString())
+            .setSubject(user.getId())
             .setExpiration(new Date(System.currentTimeMillis() + getAccessTokenExpirationMs()))
             .compact();
     }
 
-    public String generateRefreshToken(AuthenticationResponseBody authenticationResponseBody) {
-        return generateRefreshToken(new HashMap<>(),authenticationResponseBody);
+    public String generateRefreshToken(AuthenticationBody authenticationBody) {
+        HashMap<String,Object> rolesClaims = new HashMap<>();
+        rolesClaims.put(
+            "roles",
+            authenticationBody.getRoles()
+        );
+        return generateRefreshToken(rolesClaims, authenticationBody);
     }
 
     public String generateRefreshToken(
         Map<String, Object> extraClaims,
-        AuthenticationResponseBody authenticationResponseBody
+        AuthenticationBody authenticationBody
     ) {
         return getInitialBuilder()
             .setClaims(extraClaims)
-            .setSubject(authenticationResponseBody.getId().toString())
+            .setSubject(authenticationBody.getId())
             .setExpiration(new Date(System.currentTimeMillis() + getRefreshTokenExpirationMs()))
             .compact();
     }
