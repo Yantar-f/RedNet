@@ -67,17 +67,17 @@ public class SecurityConfig {
             .sessionManagement(session -> session
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/api/auth/**").permitAll()
+                .requestMatchers("/api/auth/**", "/api/test").permitAll()
                 .requestMatchers("/api/test/admin").hasAuthority(EnumRole.ADMIN.name())
                 .requestMatchers("/api/test/user").hasAuthority(EnumRole.USER.name())
                 .anyRequest().authenticated())
             .exceptionHandling(exHandle -> exHandle
                 .authenticationEntryPoint(authenticationEntryPoint))
-            .authenticationProvider(authenticationProvider())
+            //.authenticationProvider(authenticationProvider())
             .addFilterBefore(authTokenFilter, UsernamePasswordAuthenticationFilter.class)
             .build();
     }
-
+/*
     @Bean
     public AuthenticationProvider authenticationProvider() {
         DaoAuthenticationProvider authenticationProvider = new DaoAuthenticationProvider();
@@ -91,7 +91,7 @@ public class SecurityConfig {
     public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
         return config.getAuthenticationManager();
     }
-
+*/
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder(passwordEncoderStrength);

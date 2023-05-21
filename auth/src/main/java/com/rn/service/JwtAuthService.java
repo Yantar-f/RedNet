@@ -337,26 +337,6 @@ public class JwtAuthService implements AuthService {
             ).build();
     }
 
-    @Override
-    public ResponseEntity<Boolean> verifyRequest(HttpServletRequest request) {
-        Cookie[] cookies = request.getCookies();
-
-        if (cookies == null) {
-            throw new CookieNotPresentException();
-        }
-
-        String cookieToken = Arrays.stream(cookies)
-            .filter(cookie -> cookie.getName().equals(accessTokenCookieName))
-            .findFirst().orElseThrow(CookieNotPresentException::new)
-            .getValue();
-
-        if(!authTokenService.isTokenValid(cookieToken)) {
-            throw new InvalidTokenException(cookieToken);
-        }
-
-        return ResponseEntity.ok(true);
-    }
-
 
 
 
