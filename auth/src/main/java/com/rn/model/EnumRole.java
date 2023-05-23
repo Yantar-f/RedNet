@@ -1,4 +1,4 @@
-package com.rn.entity;
+package com.rn.model;
 
 public enum EnumRole {
     USER,

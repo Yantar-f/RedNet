@@ -1,6 +1,7 @@
 package com.rn.entity;
 
 
+import com.rn.model.EnumRole;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;

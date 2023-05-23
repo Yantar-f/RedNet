@@ -1,17 +1,13 @@
 package com.rn.config;
 
 import com.rn.filter.AuthTokenFilter;
-import com.rn.entity.EnumRole;
+import com.rn.model.EnumRole;
 import com.rn.entity.Role;
 import com.rn.repository.RoleRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.AuthenticationProvider;
-import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
-import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -73,25 +69,10 @@ public class SecurityConfig {
                 .anyRequest().authenticated())
             .exceptionHandling(exHandle -> exHandle
                 .authenticationEntryPoint(authenticationEntryPoint))
-            //.authenticationProvider(authenticationProvider())
             .addFilterBefore(authTokenFilter, UsernamePasswordAuthenticationFilter.class)
             .build();
     }
-/*
-    @Bean
-    public AuthenticationProvider authenticationProvider() {
-        DaoAuthenticationProvider authenticationProvider = new DaoAuthenticationProvider();
-        authenticationProvider.setUserDetailsService(userDetailsService);
-        authenticationProvider.setPasswordEncoder(passwordEncoder());
 
-        return authenticationProvider;
-    }
-
-    @Bean
-    public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
-        return config.getAuthenticationManager();
-    }
-*/
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder(passwordEncoderStrength);

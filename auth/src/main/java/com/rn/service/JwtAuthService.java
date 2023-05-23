@@ -1,7 +1,7 @@
 package com.rn.service;
 
 import com.rn.entity.EmailVerificationCredentials;
-import com.rn.entity.EnumRole;
+import com.rn.model.EnumRole;
 import com.rn.entity.RefreshToken;
 import com.rn.entity.Role;
 import com.rn.entity.User;

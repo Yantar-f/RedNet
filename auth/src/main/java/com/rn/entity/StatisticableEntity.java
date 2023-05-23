@@ -1,5 +1,6 @@
 package com.rn.entity;
 
+import com.rn.model.EnumStatus;
 import jakarta.persistence.Column;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
