@@ -11,7 +11,6 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.AuthenticationEntryPoint;
@@ -23,8 +22,6 @@ import java.util.Arrays;
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
-
-    private final UserDetailsService userDetailsService;
     private final AuthTokenFilter authTokenFilter;
     private final AuthenticationEntryPoint authenticationEntryPoint;
     private final Integer passwordEncoderStrength;
@@ -34,13 +31,11 @@ public class SecurityConfig {
 
     @Autowired
     public SecurityConfig(
-        UserDetailsService userDetailsService,
         AuthTokenFilter authTokenFilter,
         AuthenticationEntryPoint authenticationEntryPoint,
         RoleRepository roleRepository,
         @Value("${RedNet.app.passwordEncoderStrength}") Integer passwordEncoderStrength
     ) {
-        this.userDetailsService = userDetailsService;
         this.authTokenFilter = authTokenFilter;
         this.authenticationEntryPoint = authenticationEntryPoint;
         this.passwordEncoderStrength = passwordEncoderStrength;

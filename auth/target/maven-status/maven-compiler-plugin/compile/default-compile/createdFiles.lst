@@ -1,6 +1,5 @@
 com\rn\service\JwtAuthService.class
 com\rn\service\AuthService.class
-com\rn\entity\EnumRole.class
 com\rn\filter\AuthTokenFilter.class
 com\rn\repository\EmailVerificationCredentialsRepository.class
 com\rn\entity\RefreshToken.class
@@ -22,9 +21,10 @@ com\rn\repository\RefreshTokenRepository.class
 com\rn\entity\EmailVerificationCredentials.class
 com\rn\payload\SignUpRequestBody.class
 com\rn\exception\InvalidPasswordOrUsernameException.class
-com\rn\entity\EnumStatus.class
 com\rn\config\SecurityConfig.class
 com\rn\exception\OccupiedValueException.class
+com\rn\model\EnumRole.class
+com\rn\model\EnumStatus.class
 com\rn\Application.class
 com\rn\payload\SignInResponseBody.class
 com\rn\controller\TestController$Response.class
