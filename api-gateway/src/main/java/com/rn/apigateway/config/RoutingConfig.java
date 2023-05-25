@@ -22,10 +22,11 @@ public class RoutingConfig {
     public static final String AUTH_PATH = "/api/auth";
     public static final String USER_SERVICE_PATH = "/api/user";
     public static final String USER_SERVICE_URI = "http://user-service:8080";
+    public static final String SSE_SERVICE_PATH = "/api/sse";
+    public static final String SSE_SERVICE_URI = "http://sse-service:8081";
     //public static final String CHAT_SERVICE_PATH = "/api/chat";
     //public static final String CHAT_SERVICE_URI = "http://localhost:8081";
-    //public static final String SSE_SERVICE_PATH = "/api/sse";
-    //public static final String SSE_SERVICE_URI = "http://localhost:8082";
+
 
     public static class InnerHttpHeaders {
         public static final String AUTH_USER_ID =  "Auth-User-Id";
@@ -88,12 +89,15 @@ public class RoutingConfig {
                 .path(AUTH_PATH + "/test/admin")
                 .filters(f -> f.setPath(USER_SERVICE_PATH + "/test/admin"))
                 .uri(USER_SERVICE_URI))
+            .route(r -> r
+                .path(
+                    SSE_SERVICE_PATH + "/subscribe",
+                    SSE_SERVICE_PATH + "/send-new-message-notification")
+                .uri(SSE_SERVICE_URI))
             /*.route(r -> r
                 .path(CHAT_SERVICE_PATH_PATTERN)
                 .uri(CHAT_SERVICE_URI))
-            .route(r -> r
-                .path(SSE_SERVICE_PATH_PATTERN)
-                .uri(SSE_SERVICE_URI))*/
+*/
             .build();
     }
 
