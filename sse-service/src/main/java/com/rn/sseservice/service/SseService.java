@@ -16,8 +16,6 @@ import org.springframework.web.reactive.function.server.ServerResponse;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
-import java.time.Duration;
-import java.time.LocalTime;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
@@ -39,14 +37,13 @@ public class SseService {
     }
 
     public Mono<ServerResponse> subscribe(ServerRequest request){
-//        HttpCookie accessTokenCookie = request.cookies().getFirst(accessTokenCookieName);
-//        if (accessTokenCookie == null) return ServerResponse.badRequest().build();
-//
-//        String userId = jwtParser
-//            .parseClaimsJwt(accessTokenCookie.getValue())
-//            .getBody()
-//            .getSubject();
-        String userId = "1";
+        HttpCookie accessTokenCookie = request.cookies().getFirst(accessTokenCookieName);
+        if (accessTokenCookie == null) return ServerResponse.badRequest().build();
+
+        String userId = jwtParser
+            .parseClaimsJws(accessTokenCookie.getValue())
+            .getBody()
+            .getSubject();
 
         return ServerResponse.ok()
             .contentType(MediaType.TEXT_EVENT_STREAM)
