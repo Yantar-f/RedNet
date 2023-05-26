@@ -49,12 +49,12 @@ public class SseService {
             .contentType(MediaType.TEXT_EVENT_STREAM)
             .body(BodyInserters.fromServerSentEvents(Flux.create(fluxSink -> {
                 UUID uuid = UUID.randomUUID();
-                SubscriptionData subscriptionData = new SubscriptionData(userId, fluxSink);
-
-                subscriptions.put(uuid, subscriptionData);
                 fluxSink.onCancel(() -> subscriptions.remove(uuid));
 
+                SubscriptionData subscriptionData = new SubscriptionData(userId, fluxSink);
+                subscriptions.put(uuid, subscriptionData);
                 ServerSentEvent<Object> successfulSubscribeEvent = ServerSentEvent.builder((Object)("Subscribed: " + userId)).build();
+
                 fluxSink.next(successfulSubscribeEvent);
             })));
     }
