@@ -1,0 +1,10 @@
+server:
+    port: 8082
+    error:
+        include-message: always
+        include-binding-errors: always
+RedNet:
+    app:
+        accessTokenCookieName: rednet-jwt-access
+        jwt:
+            secretKey: 67556B58703273357638792F423F4428472B4B6250655368566D597133743677 #${AUTH_JWT_SECRET_KEY}
