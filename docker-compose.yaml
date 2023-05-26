@@ -1,0 +1,14 @@
+version: '3.0'
+
+services:
+    sse-service:
+        build: ./chat-service
+        env_file:
+            - ./chat-service/.env
+        ports:
+            - "8081:8081"
+        restart: unless-stopped
+networks:
+    default:
+        external:
+            name: red-net-network
