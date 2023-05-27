@@ -25,10 +25,11 @@ import java.util.function.Function;
 
 @Component
 public class JwtService {
-    private final String secretKey;
     private final Integer accessTokenExpirationMs;
     private final Integer refreshTokenExpirationMs;
     private final SignatureAlgorithm signatureAlgorithm = SignatureAlgorithm.HS256;
+    private final Key signingKey;
+    private final JwtParser jwtParser;
 
 
 
@@ -38,9 +39,10 @@ public class JwtService {
         @Value("${RedNet.app.accessTokenExpirationMs}") Integer accessTokenExpirationMs,
         @Value("${RedNet.app.refreshTokenExpirationMs}") Integer refreshTokenExpirationMs
     ) {
-        this.secretKey = secretKey;
         this.accessTokenExpirationMs = accessTokenExpirationMs;
         this.refreshTokenExpirationMs = refreshTokenExpirationMs;
+        this.signingKey = Keys.hmacShaKeyFor(Decoders.BASE64.decode(secretKey));
+        this.jwtParser = Jwts.parserBuilder().setSigningKey(signingKey).build();
     }
 
 
@@ -146,20 +148,11 @@ public class JwtService {
     }
 
     private JwtParser getJwtParser(){
-        return Jwts
-            .parserBuilder()
-            .setSigningKey(getSigningKey())
-            .build();
+        return jwtParser;
     }
 
     private Key getSigningKey() {
-        return Keys.hmacShaKeyFor(
-            Decoders.BASE64.decode(getSecretKey())
-        );
-    }
-
-    private String getSecretKey() {
-        return secretKey;
+        return signingKey;
     }
 
     public Integer getAccessTokenExpirationMs() {
