@@ -16,6 +16,7 @@ import org.springframework.web.reactive.function.server.ServerResponse;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.util.ArrayList;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
@@ -23,6 +24,7 @@ import java.util.concurrent.ConcurrentHashMap;
 @Service
 public class SseService {
     Map<UUID, SubscriptionData> subscriptions = new ConcurrentHashMap<>();
+    Map<String, ArrayList<UUID>> usersToSubscriptions = new ConcurrentHashMap<>();
     private final String accessTokenCookieName;
     private final JwtParser jwtParser;
 
@@ -49,18 +51,29 @@ public class SseService {
             .contentType(MediaType.TEXT_EVENT_STREAM)
             .body(BodyInserters.fromServerSentEvents(Flux.create(fluxSink -> {
                 UUID uuid = UUID.randomUUID();
-                fluxSink.onCancel(() -> subscriptions.remove(uuid));
+                SubscriptionData subscriptionData = new SubscriptionData(userId,fluxSink);
 
-                SubscriptionData subscriptionData = new SubscriptionData(userId, fluxSink);
                 subscriptions.put(uuid, subscriptionData);
-                ServerSentEvent<Object> successfulSubscribeEvent = ServerSentEvent.builder((Object)("Subscribed: " + userId)).build();
+
+                if (usersToSubscriptions.containsKey(userId)){
+                    usersToSubscriptions.get(userId).add(uuid);
+                } else {
+                    ArrayList<UUID> subList = new ArrayList<>();
+                    subList.add(uuid);
+                    usersToSubscriptions.put(userId,subList);
+                }
+
+                fluxSink.onCancel(() -> usersToSubscriptions.remove(subscriptions.remove(uuid).getUserId()));
+
+                ServerSentEvent<Object> successfulSubscribeEvent = ServerSentEvent
+                        .builder((Object)("Subscribed: " + userId))
+                        .build();
 
                 fluxSink.next(successfulSubscribeEvent);
             })));
     }
 
-
-    public Mono<ServerResponse> sendNewMessageNotification(ServerRequest request){
+    public Mono<ServerResponse> notifyAllUsers(ServerRequest request){
         ServerSentEvent<Object> event = ServerSentEvent
             .builder((Object)"new message")
             .build();
