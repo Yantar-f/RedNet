@@ -63,7 +63,14 @@ public class SseService {
                     usersToSubscriptions.put(userId,subList);
                 }
 
-                fluxSink.onCancel(() -> usersToSubscriptions.remove(subscriptions.remove(uuid).getUserId()));
+                fluxSink.onCancel(() -> {
+                    String tmpUserId = subscriptions.remove(uuid).getUserId();
+                    ArrayList<UUID> tmpSubscriptionData = usersToSubscriptions.get(tmpUserId);
+                    tmpSubscriptionData.remove(uuid);
+                    if (tmpSubscriptionData.isEmpty()) {
+                        usersToSubscriptions.remove(tmpUserId);
+                    }
+                });
 
                 ServerSentEvent<Object> successfulSubscribeEvent = ServerSentEvent
                         .builder((Object)("Subscribed: " + userId))
