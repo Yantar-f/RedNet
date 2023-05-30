@@ -1,16 +1,24 @@
 package com.rn.chatservice.entity;
 
+import org.springframework.data.cassandra.core.mapping.Column;
+import org.springframework.data.cassandra.core.mapping.PrimaryKey;
 import org.springframework.data.cassandra.core.mapping.Table;
 
 import java.util.Date;
 
 @Table("group_messages")
-public class GroupMessage {
+public class GroupMessageEntity {
+
+    @PrimaryKey
     private GroupMessageKey key;
+
+    @Column("timestamp")
     private Date timestamp;
+
+    @Column("message")
     private String message;
 
-    public GroupMessage(
+    public GroupMessageEntity(
         GroupMessageKey key,
         Date timestamp,
         String message

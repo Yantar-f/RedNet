@@ -1,16 +1,24 @@
 package com.rn.chatservice.entity;
 
+import org.springframework.data.cassandra.core.mapping.Column;
+import org.springframework.data.cassandra.core.mapping.PrimaryKey;
 import org.springframework.data.cassandra.core.mapping.Table;
 
 import java.util.Date;
 
 @Table("private_messages")
-public class PrivateMessage {
+public class PrivateMessageEntity {
+
+    @PrimaryKey
     private PrivateMessageKey key;
+
+    @Column("timestamp")
     private Date timestamp;
+
+    @Column("message")
     private String message;
 
-    public PrivateMessage(
+    public PrivateMessageEntity(
         PrivateMessageKey key,
         String message,
         Date timestamp

@@ -1,13 +1,19 @@
 version: '3.0'
 
 services:
-    sse-service:
+    chat-service:
         build: ./chat-service
         env_file:
             - ./chat-service/.env
         ports:
             - "8081:8081"
         restart: unless-stopped
+    chat-service-database:
+        image: cassandra
+        ports:
+            - "9042:9042"
+            - "9160:9160"
+            - "7199:7199"
 networks:
     default:
         external:
