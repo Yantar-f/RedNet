@@ -5,8 +5,8 @@ import org.springframework.web.reactive.function.server.ServerResponse;
 import reactor.core.publisher.Mono;
 
 public interface ChatService {
-    Mono<ServerResponse> getLastMessages(ServerRequest request);
-    Mono<ServerResponse> pushMessage(ServerRequest request);
+    Mono<ServerResponse> getLastPrivateMessages(ServerRequest request);
+    Mono<ServerResponse> pushPrivateMessage(ServerRequest request);
     Mono<ServerResponse> getLastGroupMessages(ServerRequest request);
     Mono<ServerResponse> pushGroupMessage(ServerRequest request);
     Mono<ServerResponse> getGroupMembers(ServerRequest request);

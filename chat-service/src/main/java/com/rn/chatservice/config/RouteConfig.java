@@ -22,12 +22,12 @@ public class RouteConfig {
 
     @Bean
     public RouterFunction<ServerResponse> routes(){
-        return route(GET(MAIN_PATH + "get_last-conversations"),chatService::getLastConversations)
+        return route(GET(MAIN_PATH + "get-last-conversations"),chatService::getLastConversations)
                 .andRoute(GET(MAIN_PATH + "get-conversations"),chatService::getConversations)
-                .andRoute(GET(MAIN_PATH + "get-last-messages"),chatService::getLastMessages)
+                .andRoute(GET(MAIN_PATH + "get-last-private-messages"),chatService::getLastPrivateMessages)
                 .andRoute(GET(MAIN_PATH + "get-last-group-messages"),chatService::getLastGroupMessages)
                 .andRoute(GET(MAIN_PATH + "get-group-members"),chatService::getGroupMembers)
-                .andRoute(POST(MAIN_PATH + "push-message"),chatService::pushMessage)
+                .andRoute(POST(MAIN_PATH + "push-private-message"),chatService::pushPrivateMessage)
                 .andRoute(POST(MAIN_PATH + "push-group-message"),chatService::pushGroupMessage)
                 .andRoute(POST(MAIN_PATH + "create-group"),chatService::createGroup)
                 .andRoute(POST(MAIN_PATH + "add-group-members"),chatService::addGroupMembers)
