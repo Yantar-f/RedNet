@@ -14,8 +14,6 @@ public interface ChatService {
     Mono<ServerResponse> getLastConversations(ServerRequest request);
     Mono<ServerResponse> createGroup(ServerRequest request);
     Mono<ServerResponse> addGroupMembers(ServerRequest request);
-
     Mono<ServerResponse> removeGroupMembers(ServerRequest request);
-
     Mono<ServerResponse> removeGroup(ServerRequest request);
 }
