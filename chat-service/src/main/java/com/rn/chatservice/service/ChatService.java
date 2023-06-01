@@ -5,15 +5,21 @@ import org.springframework.web.reactive.function.server.ServerResponse;
 import reactor.core.publisher.Mono;
 
 public interface ChatService {
-    Mono<ServerResponse> getLastPrivateMessages(ServerRequest request);
-    Mono<ServerResponse> pushPrivateMessage(ServerRequest request);
-    Mono<ServerResponse> getLastGroupMessages(ServerRequest request);
-    Mono<ServerResponse> pushGroupMessage(ServerRequest request);
-    Mono<ServerResponse> getGroupMembers(ServerRequest request);
-    Mono<ServerResponse> getConversations(ServerRequest request);
+    Mono<ServerResponse> addConversationMembers(ServerRequest request);
+    Mono<ServerResponse> editMessage(ServerRequest request);
+
+    Mono<ServerResponse> getLastMessages(ServerRequest request);
+
+    Mono<ServerResponse> getConversationMembers(ServerRequest request);
+
     Mono<ServerResponse> getLastConversations(ServerRequest request);
-    Mono<ServerResponse> createGroup(ServerRequest request);
-    Mono<ServerResponse> addGroupMembers(ServerRequest request);
-    Mono<ServerResponse> removeGroupMembers(ServerRequest request);
-    Mono<ServerResponse> removeGroup(ServerRequest request);
+
+    Mono<ServerResponse> createConversation(ServerRequest request);
+
+    Mono<ServerResponse> pushMessage(ServerRequest request);
+
+    Mono<ServerResponse> removeConversationMembers(ServerRequest request);
+
+    Mono<ServerResponse> removeConversationHistory(ServerRequest request);
+    Mono<ServerResponse> removeMessage(ServerRequest request);
 }

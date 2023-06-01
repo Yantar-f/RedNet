@@ -9,23 +9,19 @@ import reactor.core.publisher.Mono;
 @Service
 public class ChatServiceImpl implements ChatService {
 
-    public Mono<ServerResponse> addGroupMembers(ServerRequest request) {
+    public Mono<ServerResponse> addConversationMembers(ServerRequest request) {
         return null;
     }
 
-    public Mono<ServerResponse> getLastPrivateMessages(ServerRequest request) {
+    public Mono<ServerResponse> editMessage(ServerRequest request) {
         return null;
     }
 
-    public Mono<ServerResponse> getLastGroupMessages(ServerRequest request) {
+    public Mono<ServerResponse> getLastMessages(ServerRequest request) {
         return null;
     }
 
-    public Mono<ServerResponse> getGroupMembers(ServerRequest request) {
-        return null;
-    }
-
-    public Mono<ServerResponse> getConversations(ServerRequest request) {
+    public Mono<ServerResponse> getConversationMembers(ServerRequest request) {
         return null;
     }
 
@@ -33,23 +29,23 @@ public class ChatServiceImpl implements ChatService {
         return null;
     }
 
-    public Mono<ServerResponse> createGroup(ServerRequest request) {
+    public Mono<ServerResponse> createConversation(ServerRequest request) {
         return null;
     }
 
-    public Mono<ServerResponse> pushPrivateMessage(ServerRequest request) {
+    public Mono<ServerResponse> pushMessage(ServerRequest request) {
         return null;
     }
 
-    public Mono<ServerResponse> pushGroupMessage(ServerRequest request) {
+    public Mono<ServerResponse> removeConversationMembers(ServerRequest request) {
         return null;
     }
 
-    public Mono<ServerResponse> removeGroupMembers(ServerRequest request) {
+    public Mono<ServerResponse> removeConversationHistory(ServerRequest request) {
         return null;
     }
 
-    public Mono<ServerResponse> removeGroup(ServerRequest request) {
+    public Mono<ServerResponse> removeMessage(ServerRequest request) {
         return null;
     }
 }

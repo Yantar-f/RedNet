@@ -22,16 +22,14 @@ public class RouteConfig {
 
     @Bean
     public RouterFunction<ServerResponse> routes(){
-        return route(GET(MAIN_PATH + "get-last-conversations"),chatService::getLastConversations)
-                .andRoute(GET(MAIN_PATH + "get-conversations"),chatService::getConversations)
-                .andRoute(GET(MAIN_PATH + "get-last-private-messages"),chatService::getLastPrivateMessages)
-                .andRoute(GET(MAIN_PATH + "get-last-group-messages"),chatService::getLastGroupMessages)
-                .andRoute(GET(MAIN_PATH + "get-group-members"),chatService::getGroupMembers)
-                .andRoute(POST(MAIN_PATH + "push-private-message"),chatService::pushPrivateMessage)
-                .andRoute(POST(MAIN_PATH + "push-group-message"),chatService::pushGroupMessage)
-                .andRoute(POST(MAIN_PATH + "create-group"),chatService::createGroup)
-                .andRoute(POST(MAIN_PATH + "add-group-members"),chatService::addGroupMembers)
-                .andRoute(DELETE(MAIN_PATH + "remove-group"),chatService::removeGroup)
-                .andRoute(DELETE(MAIN_PATH + "remove-group-members"),chatService::removeGroupMembers);
+        return route(POST(MAIN_PATH + "add-conversation-members"),chatService::addConversationMembers)//(conversationKey, userId[])
+            .andRoute(GET(MAIN_PATH + "edit-message"),chatService::editMessage)//(messageId,conversationKey)
+            .andRoute(GET(MAIN_PATH + "get-last-conversations"),chatService::getLastConversations)//(lastConversationKey)
+            .andRoute(GET(MAIN_PATH + "get-conversation-members"),chatService::getConversationMembers)//(conversationKey)
+            .andRoute(POST(MAIN_PATH + "push-message"),chatService::pushMessage)//(conversationKey,message)
+            .andRoute(POST(MAIN_PATH + "create-conversation"),chatService::createConversation)//(userId[], title)
+            .andRoute(DELETE(MAIN_PATH + "remove-conversation-history"),chatService::removeConversationHistory)//(conversationKey)
+            .andRoute(DELETE(MAIN_PATH + "remove-conversation-members"),chatService::removeConversationMembers)//(conversationKey,userId[])
+            .andRoute(DELETE(MAIN_PATH + "remove-message"),chatService::removeMessage);//(conversationKey, messageId)
     }
 }
