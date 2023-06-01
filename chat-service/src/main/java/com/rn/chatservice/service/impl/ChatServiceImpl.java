@@ -1,5 +1,6 @@
-package com.rn.chatservice.service;
+package com.rn.chatservice.service.impl;
 
+import com.rn.chatservice.service.ChatService;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.server.ServerRequest;
 import org.springframework.web.reactive.function.server.ServerResponse;

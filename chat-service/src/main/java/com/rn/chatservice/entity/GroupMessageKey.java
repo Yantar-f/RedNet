@@ -15,18 +15,18 @@ public class GroupMessageKey implements Serializable {
     @PrimaryKeyColumn(
         name = "group_id",
         type = PARTITIONED)
-    private String groupId;
+    private final String groupId;
 
     @PrimaryKeyColumn(
         name = "user_id",
         type = PARTITIONED)
-    private String userId;
+    private final String userId;
 
     @PrimaryKeyColumn(
         name = "message_id",
         type = CLUSTERED,
         ordering = DESCENDING)
-    private String messageId;
+    private final String messageId;
 
     public GroupMessageKey(
         String groupId,

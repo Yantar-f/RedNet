@@ -10,10 +10,10 @@ import java.util.Date;
 public class PrivateMessageEntity {
 
     @PrimaryKey
-    private PrivateMessageKey key;
+    private final PrivateMessageKey key;
 
     @Column("timestamp")
-    private Date timestamp;
+    private final Date timestamp;
 
     @Column("message")
     private String message;
@@ -38,5 +38,9 @@ public class PrivateMessageEntity {
 
     public String getMessage() {
         return message;
+    }
+
+    public void setMessage(String editedMessage){
+        this.message = editedMessage;
     }
 }

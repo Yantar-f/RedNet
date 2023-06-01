@@ -15,18 +15,18 @@ public class PrivateMessageKey implements Serializable {
     @PrimaryKeyColumn(
         name = "user_from_id",
         type = PARTITIONED)
-    private String userFromId;
+    private final String userFromId;
 
     @PrimaryKeyColumn(
         name = "user_to_id",
         type = PARTITIONED)
-    private String userToId;
+    private final String userToId;
 
     @PrimaryKeyColumn(
         name = "message_id",
         type = CLUSTERED,
         ordering = DESCENDING)
-    private String messageId;
+    private final String messageId;
 
     public PrivateMessageKey(
         String userFromId,

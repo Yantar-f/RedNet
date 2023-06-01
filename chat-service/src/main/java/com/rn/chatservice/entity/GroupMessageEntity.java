@@ -10,10 +10,10 @@ import java.util.Date;
 public class GroupMessageEntity {
 
     @PrimaryKey
-    private GroupMessageKey key;
+    private final GroupMessageKey key;
 
     @Column("timestamp")
-    private Date timestamp;
+    private final Date timestamp;
 
     @Column("message")
     private String message;
@@ -38,5 +38,9 @@ public class GroupMessageEntity {
 
     public String getMessage() {
         return message;
+    }
+
+    public void setMessage(String editedMessage){
+        this.message = editedMessage;
     }
 }
