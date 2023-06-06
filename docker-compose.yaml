@@ -1,0 +1,25 @@
+version: '3.0'
+
+services:
+    user-service-database:
+        image: postgres
+        ports:
+            - "5432:5432"
+        environment:
+            POSTGRES_DB: RedNetDB
+            POSTGRES_USER: postgres
+            POSTGRES_PASSWORD: 123
+
+    user-service:
+        build: ./user-service
+        env_file:
+            -   ./user-service/.env
+        ports:
+            - "8080:8080"
+        depends_on:
+            - user-service-database
+        restart: unless-stopped
+networks:
+    default:
+        external:
+            name: red-net-network
