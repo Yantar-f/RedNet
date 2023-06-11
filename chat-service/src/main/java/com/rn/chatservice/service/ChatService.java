@@ -12,7 +12,7 @@ public interface ChatService {
 
     Mono<ServerResponse> getConversationMembers(ServerRequest request);
 
-    Mono<ServerResponse> getLastConversations(ServerRequest request);
+    Mono<ServerResponse> getConversationPreloadedList(ServerRequest request);
 
     Mono<ServerResponse> createConversation(ServerRequest request);
 
@@ -22,4 +22,8 @@ public interface ChatService {
 
     Mono<ServerResponse> removeConversationHistory(ServerRequest request);
     Mono<ServerResponse> removeMessage(ServerRequest request);
+
+    Mono<ServerResponse> getConversationMessages(ServerRequest request);
+
+    Mono<ServerResponse> editConversationTitle(ServerRequest request);
 }

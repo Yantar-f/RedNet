@@ -25,7 +25,7 @@ public class ChatServiceImpl implements ChatService {
         return null;
     }
 
-    public Mono<ServerResponse> getLastConversations(ServerRequest request) {
+    public Mono<ServerResponse> getConversationPreloadedList(ServerRequest request) {
         return null;
     }
 
@@ -46,6 +46,14 @@ public class ChatServiceImpl implements ChatService {
     }
 
     public Mono<ServerResponse> removeMessage(ServerRequest request) {
+        return null;
+    }
+
+    public Mono<ServerResponse> getConversationMessages(ServerRequest request) {
+        return null;
+    }
+
+    public Mono<ServerResponse> editConversationTitle(ServerRequest request) {
         return null;
     }
 }
