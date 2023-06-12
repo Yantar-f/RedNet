@@ -1,6 +1,6 @@
-<mxfile host="Electron" modified="2023-06-12T06:17:44.164Z" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) draw.io/21.2.8 Chrome/112.0.5615.165 Electron/24.2.0 Safari/537.36" etag="ojWusHP7O-xrOYkpUfmS" version="21.2.8" type="device">
+<mxfile host="Electron" modified="2023-06-11T11:40:56.430Z" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) draw.io/21.3.7 Chrome/112.0.5615.204 Electron/24.5.0 Safari/537.36" etag="vDyTJ_Vr-7wBwnGgUTY7" version="21.3.7" type="device">
   <diagram id="yY089J-aIF6e-MrQwjvt" name="Страница 1">
-    <mxGraphModel dx="1276" dy="656" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1169" pageHeight="827" math="0" shadow="0">
+    <mxGraphModel dx="757" dy="681" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1169" pageHeight="827" math="0" shadow="0">
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
@@ -75,7 +75,7 @@
             </Array>
           </mxGeometry>
         </mxCell>
-        <mxCell id="kDBblpaenROU-72gEPN4-20" value="Other services&lt;br&gt;(in progres)" style="rounded=0;whiteSpace=wrap;html=1;strokeColor=#3333FF;" parent="1" vertex="1">
+        <mxCell id="kDBblpaenROU-72gEPN4-20" value="Other services" style="rounded=0;whiteSpace=wrap;html=1;strokeColor=#3333FF;" parent="1" vertex="1">
           <mxGeometry x="465" y="280" width="200" height="120" as="geometry" />
         </mxCell>
         <mxCell id="kDBblpaenROU-72gEPN4-41" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0;exitY=0.5;exitDx=0;exitDy=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;endArrow=classicThin;endFill=1;startArrow=classicThin;startFill=1;" parent="1" source="ISTWP1qSsfGEcgpO0xII-13" target="ISTWP1qSsfGEcgpO0xII-3" edge="1">
