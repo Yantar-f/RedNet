@@ -10,10 +10,10 @@ Social network for data exchange, discussions, organization of events and commun
 ![app-diagram](RedNet-diagram.png)
 
 ## Project Modules Repositories
-![api-gateway](https://github.com/Yantar-f/RedNet-api-gateway)
-![user-service](https://github.com/Yantar-f/RedNet-user-service)
-![sse-service](https://github.com/Yantar-f/RedNet-sse-service)
-![chat-service](https://github.com/Yantar-f/RedNet-chat-service)
+*[api-gateway](https://github.com/Yantar-f/RedNet-api-gateway)
+*[user-service](https://github.com/Yantar-f/RedNet-user-service)
+*[sse-service](https://github.com/Yantar-f/RedNet-sse-service)
+*[chat-service](https://github.com/Yantar-f/RedNet-chat-service)
 
 ## Technology Stack
 BackEnd stack:
