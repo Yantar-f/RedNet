@@ -15,6 +15,9 @@ Social network for data exchange, discussions, organization of events and commun
 
 ## Get Started Instruction
 
+## Project Design
+![app-diagram](RedNet-diagram.png)
+
 ## Technology Stack
 BackEnd stack:
 
