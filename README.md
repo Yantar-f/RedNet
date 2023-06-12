@@ -4,19 +4,16 @@ Social network for data exchange, discussions, organization of events and commun
 
 ## Project Description
 
-### Provided Features
-#### 1.	Authentication and authorization
-#### 2. Communication
-#### 3. Viewing text, graphic and audio content
-#### 4. Creating communities
-#### 5. Creating events in communities 
-
-### User interface design
-
 ## Get Started Instruction
 
 ## Project Design
 ![app-diagram](RedNet-diagram.png)
+
+## Project Modules Repositories
+![api-gateway](https://github.com/Yantar-f/RedNet-api-gateway)
+![user-service](https://github.com/Yantar-f/RedNet-user-service)
+![sse-service](https://github.com/Yantar-f/RedNet-sse-service)
+![chat-service](https://github.com/Yantar-f/RedNet-chat-service)
 
 ## Technology Stack
 BackEnd stack:
