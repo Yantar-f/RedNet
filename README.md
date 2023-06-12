@@ -3,9 +3,9 @@ Social network for data exchange, discussions, organization of events and commun
 
 
 ## Project Description
-
+in progres...
 ## Get Started Instruction
-
+in progres...
 ## Project Design
 ![app-diagram](RedNet-diagram.png)
 
