@@ -7,7 +7,7 @@ in progres...
 ## Get Started Instruction
 in progres...
 ## Project Design
-![app-diagram](RedNet-diagram.png)
+![app-diagram](rednet-system-design.png)
 
 ## Project Modules Repositories
 * [api-gateway](https://github.com/Yantar-f/RedNet-api-gateway)
