@@ -11,7 +11,7 @@ in progres...
 
 ## Project Modules Repositories
 * [api-gateway](https://github.com/Yantar-f/RedNet-api-gateway)
-* [user-service](https://github.com/Yantar-f/RedNet-user-service)
+* [user-management-service](https://github.com/Yantar-f/RedNet-user-management-service)
 * [sse-service](https://github.com/Yantar-f/RedNet-sse-service)
 * [chat-service](https://github.com/Yantar-f/RedNet-chat-service)
 
