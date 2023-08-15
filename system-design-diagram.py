@@ -33,8 +33,10 @@ with Diagram(
             messages_db = Cassandra("messages")
 
     with Cluster("Internal Services"):
+        config_service = Spring("config")
+
         with Cluster("Notification Producer Service"):
-            notification_server = Spring("bl server")
+            notification_logic_server = Spring("bl server")
             notification_queue = RabbitMQ("notification queue")
 
         with Cluster("Session Service"):
@@ -53,12 +55,22 @@ with Diagram(
         chat_logic_server
     ]
 
+    configurable_service_group = [
+        auth_logic_server,
+        session_logic_server,
+        sse_logic_server,
+        chat_logic_server,
+        agw,
+        notification_logic_server
+    ]
+
     client >> client_request_edge >> agw >> client_proxied_request_edge >> client_service_group
     auth_logic_server >> server_to_server_edge >> session_logic_server
     auth_logic_server >> accounts_db
     auth_logic_server >> refresh_tokens_db
     chat_logic_server >> messages_db
     session_logic_server >> sessions_db
-    notifiable_service_group >> server_to_server_edge >> notification_server >> notification_queue
+    notifiable_service_group >> server_to_server_edge >> notification_logic_server >> notification_queue
     notification_queue >> server_to_server_edge >> sse_logic_server
+    configurable_service_group >> config_service
 
