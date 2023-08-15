@@ -8,7 +8,7 @@ from diagrams.programming.framework import Spring
 with Diagram(
     name="RedNet System Design",
     filename="system-design-diagram",
-    outformat="svg",
+    outformat="png",
     show=True,
     direction="TB"
 ):

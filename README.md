@@ -7,7 +7,7 @@ in progress...
 ## Get Started Instruction
 in progress...
 ## Project Design
-![app-diagram](system-design-diagram.svg)
+![app-diagram](system-design-diagram.png)
 
 ## Project Modules Repositories
 * [api-gateway](https://github.com/Yantar-f/RedNet-api-gateway)
