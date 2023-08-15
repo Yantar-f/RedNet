@@ -72,5 +72,5 @@ with Diagram(
     session_logic_server >> sessions_db
     notifiable_service_group >> server_to_server_edge >> notification_logic_server >> notification_queue
     notification_queue >> server_to_server_edge >> sse_logic_server
-    configurable_service_group >> config_service
+    configurable_service_group >> Edge(style="dashed", color="#00DEDB") >> config_service
 
