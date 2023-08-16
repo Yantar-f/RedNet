@@ -24,8 +24,9 @@ with Diagram(
             auth_logic_server = Spring("bl server")
             accounts_db = Postgresql("accounts")
             refresh_tokens_db = Redis("refresh tokens")
+            registrations_db = Redis("registrations")
 
-            auth_logic_server >> [accounts_db, refresh_tokens_db]
+            auth_logic_server >> [accounts_db, refresh_tokens_db, registrations_db]
 
         with Cluster("Sse Service"):
             sse_logic_server = Spring("bl server")
