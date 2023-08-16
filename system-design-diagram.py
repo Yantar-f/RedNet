@@ -25,12 +25,16 @@ with Diagram(
             accounts_db = Postgresql("accounts")
             refresh_tokens_db = Redis("refresh tokens")
 
+            auth_logic_server >> [accounts_db, refresh_tokens_db]
+
         with Cluster("Sse Service"):
             sse_logic_server = Spring("bl server")
 
         with Cluster("Chat Service"):
             chat_logic_server = Spring("bl server")
             messages_db = Cassandra("messages")
+
+            chat_logic_server >> messages_db
 
     with Cluster("Internal Services"):
         config_service = Spring("config")
@@ -39,11 +43,15 @@ with Diagram(
             notification_logic_server = Spring("bl server")
             notification_queue = RabbitMQ("notification queue")
 
+            notification_logic_server >> notification_queue
+
         with Cluster("Session Service"):
             session_logic_server = Spring("bl server")
             sessions_db = Cassandra("sessions")
 
-    client_service_group = [
+            session_logic_server >> sessions_db
+
+    external_service_group = [
         auth_logic_server,
         sse_logic_server,
         chat_logic_server
@@ -51,7 +59,6 @@ with Diagram(
 
     notifiable_service_group = [
         auth_logic_server,
-        session_logic_server,
         chat_logic_server
     ]
 
@@ -64,13 +71,9 @@ with Diagram(
         notification_logic_server
     ]
 
-    client >> client_request_edge >> agw >> client_proxied_request_edge >> client_service_group
+    client >> client_request_edge >> agw >> client_proxied_request_edge >> external_service_group
     auth_logic_server >> server_to_server_edge >> session_logic_server
-    auth_logic_server >> accounts_db
-    auth_logic_server >> refresh_tokens_db
-    chat_logic_server >> messages_db
-    session_logic_server >> sessions_db
-    notifiable_service_group >> server_to_server_edge >> notification_logic_server >> notification_queue
+    notifiable_service_group >> server_to_server_edge >> notification_logic_server
+    notification_logic_server >> server_to_server_edge >> session_logic_server
     notification_queue >> server_to_server_edge >> sse_logic_server
     configurable_service_group >> Edge(style="dashed", color="#00DEDB") >> config_service
-
