@@ -23,10 +23,9 @@ with Diagram(
         with Cluster("Auth Management Service"):
             auth_logic_server = Spring("bl server")
             accounts_db = Postgresql("accounts")
-            refresh_tokens_db = Redis("refresh tokens")
             registrations_db = Redis("registrations")
 
-            auth_logic_server >> [accounts_db, refresh_tokens_db, registrations_db]
+            auth_logic_server >> [accounts_db, registrations_db]
 
         with Cluster("Sse Service"):
             sse_logic_server = Spring("bl server")
@@ -48,7 +47,7 @@ with Diagram(
 
         with Cluster("Session Service"):
             session_logic_server = Spring("bl server")
-            sessions_db = Cassandra("sessions")
+            sessions_db = Redis("sessions")
 
             session_logic_server >> sessions_db
 
