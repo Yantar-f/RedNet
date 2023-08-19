@@ -39,11 +39,11 @@ with Diagram(
     with Cluster("Internal Services"):
         config_service = Spring("config")
 
-        with Cluster("Notification Producer Service"):
-            notification_logic_server = Spring("bl server")
-            notification_queue = RabbitMQ("notification queue")
+        with Cluster("Event Producer Service"):
+            event_logic_server = Spring("bl server")
+            event_queue = RabbitMQ("event queue")
 
-            notification_logic_server >> notification_queue
+            event_logic_server >> event_queue
 
         with Cluster("Session Service"):
             session_logic_server = Spring("bl server")
@@ -68,12 +68,12 @@ with Diagram(
         sse_logic_server,
         chat_logic_server,
         agw,
-        notification_logic_server
+        event_logic_server
     ]
 
     client >> client_request_edge >> agw >> client_proxied_request_edge >> external_service_group
     auth_logic_server >> server_to_server_edge >> session_logic_server
-    notifiable_service_group >> server_to_server_edge >> notification_logic_server
-    notification_logic_server >> server_to_server_edge >> session_logic_server
-    notification_queue >> server_to_server_edge >> sse_logic_server
+    notifiable_service_group >> server_to_server_edge >> event_logic_server
+    event_logic_server >> server_to_server_edge >> session_logic_server
+    event_queue >> server_to_server_edge >> sse_logic_server
     configurable_service_group >> Edge(style="dashed", color="#00DEDB") >> config_service
