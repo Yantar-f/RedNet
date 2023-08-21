@@ -5,21 +5,24 @@ from diagrams.onprem.inmemory import Redis
 from diagrams.onprem.queue import RabbitMQ
 from diagrams.programming.framework import Spring
 
-with Diagram(
+with (Diagram(
     name="RedNet System Design",
     filename="system-design-diagram",
     outformat="png",
     show=True,
     direction="TB"
-):
+)):
     client_request_edge = Edge(color="#0ECC00")
     client_proxied_request_edge = Edge(color="#0ECC00", style="dashed")
     server_to_server_edge = Edge(color="#00DEDB")
+    server_to_server_proxied_edge = Edge(color="#00DEDB", style="dashed")
+    config_edge = Edge(color="orange")
 
     client = User("spa")
-    agw = Spring("agw")
 
     with Cluster("External Services"):
+        agw = Spring("agw")
+
         with Cluster("Auth Management Service"):
             auth_logic_server = Spring("bl server")
             accounts_db = Postgresql("accounts")
@@ -37,6 +40,7 @@ with Diagram(
             chat_logic_server >> messages_db
 
     with Cluster("Internal Services"):
+        internal_agw = Spring("internal agw")
         config_service = Spring("config")
 
         with Cluster("Event Producer Service"):
@@ -51,29 +55,35 @@ with Diagram(
 
             session_logic_server >> sessions_db
 
-    external_service_group = [
-        auth_logic_server,
-        sse_logic_server,
-        chat_logic_server
-    ]
+        external_service_group = [
+            auth_logic_server,
+            sse_logic_server,
+            chat_logic_server
+        ]
 
-    notifiable_service_group = [
-        auth_logic_server,
-        chat_logic_server
-    ]
+        internal_service_group = [
+            session_logic_server,
+            event_logic_server
+        ]
 
-    configurable_service_group = [
-        auth_logic_server,
-        session_logic_server,
-        sse_logic_server,
-        chat_logic_server,
-        agw,
-        event_logic_server
-    ]
+        services = internal_service_group + external_service_group
+
+        notifiable_service_group = [
+            auth_logic_server,
+            chat_logic_server
+        ]
+
+        configurable_service_group = [
+            auth_logic_server,
+            session_logic_server,
+            sse_logic_server,
+            chat_logic_server,
+            agw,
+            internal_agw,
+            event_logic_server
+        ]
 
     client >> client_request_edge >> agw >> client_proxied_request_edge >> external_service_group
-    auth_logic_server >> server_to_server_edge >> session_logic_server
-    notifiable_service_group >> server_to_server_edge >> event_logic_server
-    event_logic_server >> server_to_server_edge >> session_logic_server
+    external_service_group >> server_to_server_edge >> internal_agw >> server_to_server_proxied_edge >> internal_service_group
     event_queue >> server_to_server_edge >> sse_logic_server
-    configurable_service_group >> Edge(style="dashed", color="#00DEDB") >> config_service
+    configurable_service_group >> config_edge >> config_service
