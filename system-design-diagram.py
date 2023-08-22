@@ -51,7 +51,7 @@ with (Diagram(
 
         with Cluster("Session Service"):
             session_logic_server = Spring("bl server")
-            sessions_db = Redis("sessions")
+            sessions_db = Cassandra("sessions")
 
             session_logic_server >> sessions_db
 
