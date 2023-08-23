@@ -35,9 +35,6 @@ with (Diagram(
 
         with Cluster("Chat Service"):
             chat_logic_server = Spring("bl server")
-            messages_db = Cassandra("messages")
-
-            chat_logic_server >> messages_db
 
     with Cluster("Internal Services"):
         internal_agw = Spring("internal agw")
@@ -55,6 +52,18 @@ with (Diagram(
 
             session_logic_server >> sessions_db
 
+        with Cluster("Message service"):
+            message_bl_server = Spring("bl server")
+            message_db = Cassandra("messages")
+
+            message_bl_server >> message_db
+
+        with Cluster("Conversation service"):
+            conversation_logic_server = Spring("bl server")
+            conversations_db = Cassandra("conversations")
+
+            conversation_logic_server >> conversations_db
+
         external_service_group = [
             auth_logic_server,
             sse_logic_server,
@@ -63,7 +72,9 @@ with (Diagram(
 
         internal_service_group = [
             session_logic_server,
-            event_logic_server
+            event_logic_server,
+            message_bl_server,
+            conversation_logic_server
         ]
 
         services = internal_service_group + external_service_group
@@ -73,15 +84,7 @@ with (Diagram(
             chat_logic_server
         ]
 
-        configurable_service_group = [
-            auth_logic_server,
-            session_logic_server,
-            sse_logic_server,
-            chat_logic_server,
-            agw,
-            internal_agw,
-            event_logic_server
-        ]
+        configurable_service_group = internal_service_group + external_service_group + [agw, internal_agw]
 
     client >> client_request_edge >> agw >> client_proxied_request_edge >> external_service_group
     external_service_group >> server_to_server_edge >> internal_agw >> server_to_server_proxied_edge >> internal_service_group
