@@ -12,11 +12,9 @@ with (Diagram(
     show=True,
     direction="TB"
 )):
-    client_request_edge = Edge(color="#0ECC00")
-    client_proxied_request_edge = Edge(color="#0ECC00", style="dashed")
     server_to_server_edge = Edge(color="#00DEDB")
     server_to_server_proxied_edge = Edge(color="#00DEDB", style="dashed")
-    config_edge = Edge(color="orange")
+    config_edge = Edge(color="#8AD618")
 
     client = User("spa")
 
@@ -39,6 +37,7 @@ with (Diagram(
     with Cluster("Internal Services"):
         internal_agw = Spring("internal agw")
         config_service = Spring("config")
+        service_discovery = Spring("service discovery")
 
         with Cluster("Event Producer Service"):
             event_logic_server = Spring("bl server")
@@ -85,8 +84,10 @@ with (Diagram(
         ]
 
         configurable_service_group = internal_service_group + external_service_group + [agw, internal_agw]
+        discovered_service_group = configurable_service_group
 
-    client >> client_request_edge >> agw >> client_proxied_request_edge >> external_service_group
+    client >> server_to_server_edge >> agw >> server_to_server_proxied_edge >> external_service_group
     external_service_group >> server_to_server_edge >> internal_agw >> server_to_server_proxied_edge >> internal_service_group
     event_queue >> server_to_server_edge >> sse_logic_server
     configurable_service_group >> config_edge >> config_service
+    discovered_service_group >> config_edge >> service_discovery
