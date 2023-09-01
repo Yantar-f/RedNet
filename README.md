@@ -3,15 +3,15 @@ Social network for data exchange, discussions, organization of events and commun
 
 
 ## Project Description
-in progres...
+in progress...
 ## Get Started Instruction
-in progres...
+in progress...
 ## Project Design
-![app-diagram](RedNet-diagram.png)
+![app-diagram](system-design-diagram.png)
 
 ## Project Modules Repositories
 * [api-gateway](https://github.com/Yantar-f/RedNet-api-gateway)
-* [user-service](https://github.com/Yantar-f/RedNet-user-service)
+* [auth-management-service](https://github.com/Yantar-f/RedNet-auth-management-service)
 * [sse-service](https://github.com/Yantar-f/RedNet-sse-service)
 * [chat-service](https://github.com/Yantar-f/RedNet-chat-service)
 
@@ -26,4 +26,4 @@ BackEnd stack:
 [![RabbitMQ](https://img.shields.io/badge/Rabbitmq-FF6600?style=for-the-badge&logo=rabbitmq&logoColor=white)](https://www.rabbitmq.com/)
 
 FrontEnd stack:
-in progres...
+in progress...
