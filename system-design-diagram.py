@@ -23,9 +23,6 @@ with (Diagram(
 
         with Cluster("Auth Management Service"):
             auth_logic_server = Spring("bl server")
-            registrations_db = Redis("registrations")
-
-            auth_logic_server >> registrations_db
 
         with Cluster("Sse Service"):
             sse_logic_server = Spring("bl server")
@@ -37,6 +34,12 @@ with (Diagram(
         internal_agw = Spring("internal agw")
         config_service = Spring("config")
         service_discovery = Spring("service discovery")
+
+        with Cluster("Registration Service"):
+            registration_logic_server = Spring("bl server")
+            registrations_db = Redis("registrations")
+
+            registration_logic_server >> registrations_db
 
         with Cluster("Account Service"):
             account_logic_server = Spring("bl server")
@@ -75,6 +78,7 @@ with (Diagram(
         ]
 
         internal_service_group = [
+            registration_logic_server,
             account_logic_server,
             session_logic_server,
             event_logic_server,
