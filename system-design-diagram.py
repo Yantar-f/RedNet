@@ -23,10 +23,9 @@ with (Diagram(
 
         with Cluster("Auth Management Service"):
             auth_logic_server = Spring("bl server")
-            accounts_db = Postgresql("accounts")
             registrations_db = Redis("registrations")
 
-            auth_logic_server >> [accounts_db, registrations_db]
+            auth_logic_server >> registrations_db
 
         with Cluster("Sse Service"):
             sse_logic_server = Spring("bl server")
@@ -38,6 +37,12 @@ with (Diagram(
         internal_agw = Spring("internal agw")
         config_service = Spring("config")
         service_discovery = Spring("service discovery")
+
+        with Cluster("Account Service"):
+            account_logic_server = Spring("bl server")
+            accounts_db = Postgresql("accounts")
+
+            account_logic_server >> accounts_db
 
         with Cluster("Event Producer Service"):
             event_logic_server = Spring("bl server")
@@ -51,13 +56,13 @@ with (Diagram(
 
             session_logic_server >> sessions_db
 
-        with Cluster("Message service"):
+        with Cluster("Message Service"):
             message_bl_server = Spring("bl server")
             message_db = Cassandra("messages")
 
             message_bl_server >> message_db
 
-        with Cluster("Conversation service"):
+        with Cluster("Conversation Service"):
             conversation_logic_server = Spring("bl server")
             conversations_db = Cassandra("conversations")
 
@@ -70,6 +75,7 @@ with (Diagram(
         ]
 
         internal_service_group = [
+            account_logic_server,
             session_logic_server,
             event_logic_server,
             message_bl_server,
