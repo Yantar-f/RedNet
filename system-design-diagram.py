@@ -1,10 +1,5 @@
 from diagrams import Diagram, Cluster, Edge
-from diagrams.onprem.client import User
-from diagrams.onprem.database import Postgresql, Cassandra
-from diagrams.onprem.inmemory import Redis
-from diagrams.onprem.queue import RabbitMQ
-from diagrams.programming.framework import Spring
-
+from diagrams.c4 import Person, SystemBoundary, Container, Database
 with (Diagram(
     name="RedNet System Design",
     filename="system-design-diagram",
@@ -16,58 +11,124 @@ with (Diagram(
     server_to_server_proxied_edge = Edge(color="#00DEDB", style="dashed")
     config_edge = Edge(color="#8AD618")
 
-    client = User("spa")
+    client = Person(
+        name="Client",
+        description="Single-Page-Application"
+    )
 
     with Cluster("External Services"):
-        agw = Spring("agw")
+        agw = Container(
+            name="API gateway",
+            technology="Spring cloud gateway",
+            description="validates auth tokens, routes and load balance requests"
+        )
 
-        with Cluster("Auth Management Service"):
-            auth_logic_server = Spring("bl server")
+        auth_logic_server = Container(
+            name="Auth management service",
+            technology="Spring boot",
+            description="Service for management authentication and authorization"
+        )
 
-        with Cluster("Sse Service"):
-            sse_logic_server = Spring("bl server")
+        sse_logic_server = Container(
+            name="SSE service",
+            technology="Spring boot",
+            description="Service for send one-directional event notifications"
+        )
 
-        with Cluster("Chat Service"):
-            chat_logic_server = Spring("bl server")
+        chat_logic_server = Container(
+            name="Chat service",
+            technology="Spring boot",
+            description="Service for providing chat features"
+        )
 
     with Cluster("Internal Services"):
-        internal_agw = Spring("internal agw")
-        config_service = Spring("config")
-        service_discovery = Spring("service discovery")
+        internal_agw = Container(
+            name="API Gateway",
+            technology="Spring cloud gateway",
+            description="routes and load balance requests"
+        )
 
-        with Cluster("Registration Service"):
-            registration_logic_server = Spring("bl server")
-            registrations_db = Redis("registrations")
+        config_service = Container(
+            name="Config server",
+            technology="Spring cloud config",
+            description="Contains general configuration for all system"
+        )
+
+        service_discovery = Container(
+            name="Service discovery",
+            technology="Eureka server",
+            description="Service for storing and registration active services"
+        )
+
+        event_queue = Container(
+            name="Event queue",
+            technology="RabbitMQ",
+            description="MQ for system event notifications"
+        )
+
+        with Cluster(""):
+            registration_logic_server = Container(
+                name="Registration service",
+                technology="Spring boot",
+                description="Service for storing web-app registrations"
+            )
+
+            registrations_db = Database(
+                name="Registrations",
+                technology="Redis",
+            )
 
             registration_logic_server >> registrations_db
 
-        with Cluster("Account Service"):
-            account_logic_server = Spring("bl server")
-            accounts_db = Postgresql("accounts")
+            account_logic_server = Container(
+                name="Account service",
+                technology="Spring boot",
+                description="Service for storing accounts general info"
+            )
+
+            accounts_db = Database(
+                name="Accounts",
+                technology="PostgreSQL"
+            )
 
             account_logic_server >> accounts_db
 
-        with Cluster("Event Producer Service"):
-            event_logic_server = Spring("bl server")
-            event_queue = RabbitMQ("event queue")
+            session_logic_server = Container(
+                name="Session service",
+                technology="Spring boot",
+                description="Service for storing sessions"
+            )
 
-            event_logic_server >> event_queue
-
-        with Cluster("Session Service"):
-            session_logic_server = Spring("bl server")
-            sessions_db = Cassandra("sessions")
+            sessions_db = Database(
+                name="Sessions",
+                technology="CassandraDB"
+            )
 
             session_logic_server >> sessions_db
 
-        with Cluster("Message Service"):
-            message_bl_server = Spring("bl server")
-            message_db = Cassandra("messages")
+            message_bl_server = Container(
+                name="Message service",
+                technology="Spring boot",
+                description="Service for storing sessions"
+            )
+
+            message_db = Database(
+                name="Messages",
+                technology="CassandraDB"
+            )
 
             message_bl_server >> message_db
 
-        with Cluster("Conversation Service"):
-            conversation_logic_server = Spring("bl server")
-            conversations_db = Cassandra("conversations")
+            conversation_logic_server = Container(
+                name="Conversation Service",
+                technology="Spring boot",
+                description="Service for storing info about conversations"
+            )
+
+            conversations_db = Database(
+                name="Conversations info",
+                technology="CassandreDB"
+            )
 
             conversation_logic_server >> conversations_db
 
@@ -81,7 +142,6 @@ with (Diagram(
             registration_logic_server,
             account_logic_server,
             session_logic_server,
-            event_logic_server,
             message_bl_server,
             conversation_logic_server
         ]
@@ -98,6 +158,6 @@ with (Diagram(
 
     client >> server_to_server_edge >> agw >> server_to_server_proxied_edge >> external_service_group
     external_service_group >> server_to_server_edge >> internal_agw >> server_to_server_proxied_edge >> internal_service_group
-    event_queue >> server_to_server_edge >> sse_logic_server
+    internal_service_group >> event_queue >> server_to_server_edge >> sse_logic_server
     configurable_service_group >> config_edge >> config_service
     discovered_service_group >> config_edge >> service_discovery
