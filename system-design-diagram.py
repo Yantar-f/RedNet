@@ -69,7 +69,7 @@ with (Diagram(
         with Cluster(""):
             registration_logic_server = Container(
                 name="Registration service",
-                technology="Spring boot",
+                technology="Django",
                 description="Service for storing web-app registrations"
             )
 
